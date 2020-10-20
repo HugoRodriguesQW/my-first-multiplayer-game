@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Game</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>const socket = io();</script>
+
+  </head>
+  <body>
+    <ul id="received"></ul>
+
+    <script>
+      const events = document.getElementById("received"); 
+      const newItem = (content) => {
+        const item = document.createElement('li');
+        item.innerText = content;
+        return item;
+     };
+    </script>
+
+    
+    <script>
+      console.log("I am: "+ socket.id)
+    </script>
+
+  </body>
+</html>
