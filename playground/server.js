@@ -11,10 +11,14 @@ const garden = createGarden()
 
 sockets.on('connection', function(socket){
   const socketId = socket.id
+  console.log('!Conected: '+socketId)
   const clientState = garden.addClient(socketId)
   socket.emit('bootstrap', garden)
-
-  console.log("New Client Connected :"+ garden.clients[socketId].id)
+  
+  socket.on('disconnect', ()=> {
+    console.log('!Desconected: '+socketId)
+    garden.removeClient(socketId)
+})
 })
 
 
@@ -43,6 +47,7 @@ function createGarden(){
   
   function removeClient(socketId){
     delete garden.clients[socketId]
+    console.log('!Deleted: '+socketId)
   }
 
   return garden
