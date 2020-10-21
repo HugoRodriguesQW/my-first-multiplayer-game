@@ -1,6 +1,14 @@
-# Jogo Multiplayer
+Jogo Multiplayer
 
 Meu primeiro jogo multiplayer para estudar **Node.js**, **Socket.io** e **Javascript**.
+
+
+<p align="center">
+<img align="left" src="https://nodejs.org/static/images/logos/nodejs-new-pantone-black.svg" width="100px" height="100px"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/200px-Unofficial_JavaScript_logo_2.svg.png" height="100px"/>
+<img  align="right" src="https://upload.wikimedia.org/wikipedia/commons/9/96/Socket-io.svg" width="100px"/>
+ 
+</p>
 
 ---
 
