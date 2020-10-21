@@ -8,10 +8,6 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>const socket = io();</script>
-
     <style>
       body {
         margin: 40px 0 0 0;
@@ -46,6 +42,11 @@
       }
 
     </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>const socket = io();</script>
+
   </head>
   <body>
     <div class="client-page">
@@ -77,30 +78,42 @@
 
         const area = canvas.getContext('2d')
 
-        area.globalAlpha = 1
-        area.fillStyle = 'white'
-        area.fillRect(0, 0, garden.canvasWidth, garden.canvasHeight)
+        requestAnimationFrame(RenderScreen)
 
-        for (const socketId in garden.clients) {
-          const allPixels = garden.canvasWidth * garden.canvasHeight
-
-          const client = garden.clients[socketId]
-          area.fillStyle = '#000000'
-          area.globalAlpha = 0.1
-          area.fillRect(client.x, client.y, 1, 1)
-        }
-
-        const currentClient = garden.clients[socket.id]
-          area.fillStyle = '#00FFDD'
+        function RenderScreen(){
           area.globalAlpha = 1
-          area.fillRect(currentClient.x, currentClient.y, 1, 1)
-      })
+          area.fillStyle = 'white'
+          area.fillRect(0, 0, garden.canvasWidth, garden.canvasHeight)
+  
+  
+          for (const socketId in garden.clients) {
+            const allPixels = garden.canvasWidth * garden.canvasHeight
+  
+            const client = garden.clients[socketId]
+            area.fillStyle = '#000000'
+            area.globalAlpha = 0.1
+            area.fillRect(client.x, client.y, 1, 1)
+          }
+  
+          const currentClient = garden.clients[socket.id]
+            area.fillStyle = '#00FFDD'
+            area.globalAlpha = 1
+            area.fillRect(currentClient.x, currentClient.y, 1, 1)
+          
+          requestAnimationFrame(RenderScreen)
 
-      socket.on('disconnect', function () {
+        }
+        socket.on('client-remove', (socketId) =>{
+         delete garden.clients[socketId]
+        })
 
-      socket.emit('disconnected', (socketId));
+        socket.on('client-update', (update) =>{
+          garden.clients[update.socketId] = update.newState;
+        })
 
-  });
+      }) // 'bootstrap' end
+
+        
     </script>
 
   </body>
