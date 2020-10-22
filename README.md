@@ -42,3 +42,5 @@ Gitpod: [gitpod.io/#](gitpod.io/#https://github.com/HugoRodriguesQW/my-first-mul
 
 **!** O jogo ainda não existe. Começarei fazendo uma comunicação entre server e client em tempo real.
 Assim que conseguir isso criarei o jogo. Basta implementá-lo depois.
+
+**!** Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)
