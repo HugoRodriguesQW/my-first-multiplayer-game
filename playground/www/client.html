@@ -1,8 +1,75 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>Game</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <style>
+      body {
+        margin: 40px 0 0 0;
+        padding: 0;
+        background: #f2f2f2;
+        text-align: center;
+
+        font-family: 'Monserrat', sans-serif;
+      }
+      .client-page{
+        display: flex;
+        justify-content: space-between;
+        background: #fff; 
+      }
+
+      .client-page header{
+       width: 100%;
+       height: 100%;
+      }
+
+      aside h1{
+        color: #aaa;
+      }
+      #area {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+
+        margin: 20px 100px 20px 0;
+        vertical-align: middle;
+        box-shadow:  0px 0px 30px rgba(0,0,0,0.2);
+        border-radius: 10px;
+      }
+
+      .page-content {
+        color: #999;
+        text-align: left;
+        padding: 10px 20px;
+        margin: 0 20px;
+        height: 70%;
+      }
+      .control-buttons{
+        text-align: center;
+        height: 200px;
+      }
+
+      .control-buttons button{
+        margin-top: 60px;
+        bottom: 0;
+        width: auto;
+        height: 30px;
+        border: 0;
+        border-radius: 10px;
+        color: #555;
+        background: #fff;
+        box-shadow: 0px 0px 30px rgba(0,0,0,0.2);
+        transition: background-color 200ms;
+      }
+      .control-buttons button:hover{
+         background: #ddd;
+      }
+    </style>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -10,20 +77,97 @@
 
   </head>
   <body>
-    <ul id="received"></ul>
+    <div class="client-page">
+    <header>
+      <aside>
+        <h1>Meu Primeiro Jogo Multiplayer</h1>
+        <div class="page-content">
+          <b>What's new:</b>
+          <ul>
+            <li>Connection between server and client using websockets.</li>
+            <li>Function to remove disconnected clients.</li>
+            <li>Everyone is notified and updates their screens.</li>
+            <li>The blue dot represents the current client.</li>
+            <li>The grey dot represents others clients.</li>
+          </ul>
 
-    <script>
-      const events = document.getElementById("received"); 
-      const newItem = (content) => {
-        const item = document.createElement('li');
-        item.innerText = content;
-        return item;
-     };
+          <b>What is still missing:</b>
+
+           <ul>
+            <li>Create the game itself using <i>canvas</i>. (The example on the side is of <a style="text-decoration: none; color: #555;" href="https://github.com/filipedeschamps/" target="_blank">Filipe Deschamps</a>)</li>
+            <li>Implement the game in the project.</li>
+            <li>Improve the code.</li>
+            <li>Do the things I certainly forgot.</li>
+          </ul>
+
+          <div class="control-buttons">
+            <button onclick="location.reload()">Recarregar</button>
+            <button onclick="window.open(window.location.href.toString(), '_blank')">Adicionar um client</button>
+            <button onclick="window.open('https://gitpod.io/#https://github.com/HugoRodriguesQW/my-first-multiplayer-game/', '_blank')">Abrir no Gitpod</button>
+            <button onclick="window.open('https://github.com/HugoRodriguesQW/my-first-multiplayer-game', '_blank')">Abrir repositório</button>
+          </div>
+        </div>
+      </aside>
+    </header>
+    <main>
+      <canvas id="area"></canvas>
+    </main>
+    </div>
+    <script> <!-- Render canvas-->
+      
     </script>
 
-    
-    <script>
-      console.log("I am: "+ socket.id)
+    <script> <!-- Fill -->
+
+      const canvas = document.getElementById('area');
+      
+      socket.on('bootstrap', (gardenInitial) =>{
+        garden = gardenInitial
+        canvas.style.width = `${garden.canvasWidth * 15}px`
+        canvas.style.height = `${garden.canvasHeight * 15}px`
+        canvas.width = garden.canvasWidth
+        canvas.height = garden.canvasHeight
+
+        console.log('> Connected. My ID: '+ socket.id)
+
+        const area = canvas.getContext('2d')
+
+        requestAnimationFrame(RenderScreen)
+
+        function RenderScreen(){
+          area.globalAlpha = 1
+          area.fillStyle = 'white'
+          area.fillRect(0, 0, garden.canvasWidth, garden.canvasHeight)
+  
+  
+          for (const socketId in garden.clients) {
+            const allPixels = garden.canvasWidth * garden.canvasHeight
+  
+            const client = garden.clients[socketId]
+            area.fillStyle = '#000000'
+            area.globalAlpha = 0.1
+            area.fillRect(client.x, client.y, 1, 1)
+          }
+  
+          const currentClient = garden.clients[socket.id]
+            area.fillStyle = '#00FFDD'
+            area.globalAlpha = 1
+            area.fillRect(currentClient.x, currentClient.y, 1, 1)
+          
+          requestAnimationFrame(RenderScreen)
+
+        }
+        socket.on('client-remove', (socketId) =>{
+         delete garden.clients[socketId]
+        })
+
+        socket.on('client-update', (update) =>{
+          garden.clients[update.socketId] = update.newState;
+        })
+
+      }) // 'bootstrap' end
+
+        
     </script>
 
   </body>

@@ -1,48 +1,55 @@
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
-const io = require('socket.io')(server)
+const sockets = require('socket.io')(server)
 
 app.get('/', (req, res)=> {
   res.sendFile(__dirname+"/www/client.html")
 })
 
-const garden = createClientsObjects()
+const garden = createGarden()
 
-
-// If have a new client connection
-io.on('connection', function(socket){
-  const ClientState = garden.addPlayer(socket.id)
+sockets.on('connection', function(socket){
+  const socketId = socket.id
+  const clientState = garden.addClient(socketId)
   socket.emit('bootstrap', garden)
+  
+  socket.broadcast.emit('client-update', {
+      socketId: socket.id,
+      newState: garden.clients[socket.id]
+    })
+
+  socket.on('disconnect', ()=> {
+    garden.removeClient(socketId)
+    socket.broadcast.emit('client-remove', socket.id)
+})
 })
 
-socket.on('disconnect', () => {
-    game.removePlayer(socket.id)
-    socket.broadcast.emit('player-remove', socket.id)
-  })
 
 // Serve on port 8080
-server.listen(8080, () => {
-    console.log("Server: Listening on port: 8080")
+server.listen(3000, () => {
+  console.log("Server: Listening on port: 3000")
 })
 
 
-// Create the Clients Garden
-function createClientsObjects(){
+function createGarden(){
   const garden = {
-    clients:{},
+    canvasWidth: 35,
+    canvasHeight: 30,
+    clients: {},
     addClient,
-    RemoveClient
+    removeClient
   }
 
   function addClient(socketId){
-    return garden.clients[socketId] = {
+    return  garden.clients[socketId] = {
       id: socketId,
-      number: io.engine.clientsCount
+      x: Math.floor(Math.random() * garden.canvasWidth),
+      y: Math.floor(Math.random() * garden.canvasHeight),
     }
   }
-
-  function RemoveClient(socketId){
+  
+  function removeClient(socketId){
     delete garden.clients[socketId]
   }
 
