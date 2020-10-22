@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>Game</title>
@@ -38,9 +38,37 @@
 
         margin: 20px 100px 20px 0;
         vertical-align: middle;
-        box-shadow:  0px 0px 30px rgba(0,0,0,0.2)
+        box-shadow:  0px 0px 30px rgba(0,0,0,0.2);
+        border-radius: 10px;
       }
 
+      .page-content {
+        color: #999;
+        text-align: left;
+        padding: 10px 20px;
+        margin: 0 20px;
+        height: 70%;
+      }
+      .control-buttons{
+        text-align: center;
+        height: 200px;
+      }
+
+      .control-buttons button{
+        margin-top: 60px;
+        bottom: 0;
+        width: auto;
+        height: 30px;
+        border: 0;
+        border-radius: 10px;
+        color: #555;
+        background: #fff;
+        box-shadow: 0px 0px 30px rgba(0,0,0,0.2);
+        transition: background-color 200ms;
+      }
+      .control-buttons button:hover{
+         background: #ddd;
+      }
     </style>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -53,6 +81,32 @@
     <header>
       <aside>
         <h1>Meu Primeiro Jogo Multiplayer</h1>
+        <div class="page-content">
+          <b>What's new:</b>
+          <ul>
+            <li>Connection between server and client using websockets.</li>
+            <li>Function to remove disconnected clients.</li>
+            <li>Everyone is notified and updates their screens.</li>
+            <li>The blue dot represents the current client.</li>
+            <li>The grey dot represents others clients.</li>
+          </ul>
+
+          <b>What is still missing:</b>
+
+           <ul>
+            <li>Create the game itself using <i>canvas</i>. (The example on the side is of <a style="text-decoration: none; color: #555;" href="https://github.com/filipedeschamps/" target="_blank">Filipe Deschamps</a>)</li>
+            <li>Implement the game in the project.</li>
+            <li>Improve the code.</li>
+            <li>Do the things I certainly forgot.</li>
+          </ul>
+
+          <div class="control-buttons">
+            <button onclick="location.reload()">Recarregar</button>
+            <button onclick="window.open(window.location.href.toString(), '_blank')">Adicionar um client</button>
+            <button onclick="window.open('https://gitpod.io/#https://github.com/HugoRodriguesQW/my-first-multiplayer-game/', '_blank')">Abrir no Gitpod</button>
+            <button onclick="window.open('https://github.com/HugoRodriguesQW/my-first-multiplayer-game', '_blank')">Abrir repositório</button>
+          </div>
+        </div>
       </aside>
     </header>
     <main>
