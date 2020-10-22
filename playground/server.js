@@ -1,26 +1,31 @@
-const express = require('express')
-const app = express()
+const app = require('express')()
 const server = require('http').createServer(app)
 const sockets = require('socket.io')(server)
 
 app.get('/', (req, res)=> {
-  res.sendFile(__dirname+"/www/client.html")
+  res.sendFile(__dirname+"/www/game.html")
 })
 
-const garden = createGarden()
+const game = makeGame()
+let maxConnections = 15;
 
 sockets.on('connection', function(socket){
-  const socketId = socket.id
-  const clientState = garden.addClient(socketId)
-  socket.emit('bootstrap', garden)
+  const socketId = socket.io
+  if(sockets.engine.clientsCount <= (maxConnections+1)){
+    const clientState = game.addClient(socketId)
+  }else{
+   socket.emit('max-connections-error', 'Máximo de conexões atingido. Tente mais tarde') 
+   socket.conn.close()
+  }
+  socket.emit('bootstrap', game)
   
   socket.broadcast.emit('client-update', {
       socketId: socket.id,
-      newState: garden.clients[socket.id]
+      newState: game.clients[socket.id]
     })
 
   socket.on('disconnect', ()=> {
-    garden.removeClient(socketId)
+    game.removeClient(socketId)
     socket.broadcast.emit('client-remove', socket.id)
 })
 })
@@ -32,26 +37,26 @@ server.listen(3000, () => {
 })
 
 
-function createGarden(){
-  const garden = {
-    canvasWidth: 35,
-    canvasHeight: 30,
+function makeGame(){
+
+  const game = {
+    spawSize: 3000,
     clients: {},
     addClient,
     removeClient
   }
 
   function addClient(socketId){
-    return  garden.clients[socketId] = {
+    return game.clients[socketId] = {
       id: socketId,
-      x: Math.floor(Math.random() * garden.canvasWidth),
-      y: Math.floor(Math.random() * garden.canvasHeight),
+      x: Math.floor(Math.random() * game.spawSize),
+      y: Math.floor(Math.random() * game.spawSize),
     }
   }
   
   function removeClient(socketId){
-    delete garden.clients[socketId]
+    delete game.clients[socketId]
   }
 
-  return garden
+  return game
 }
