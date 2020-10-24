@@ -3,21 +3,24 @@
   <head>
     <meta charset="utf-8">
     <title>Game Multiplayer</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name='viewport' content='user-scalable=0' />
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta name='viewport' content='user-scalable=0'/>
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet">
 
     <style>
+      *{
+        font-family: 'Nunito', sans-serif;
+      }
       body{
         margin: 0;
         margin-top: -4px;
+        background: #000;
+        user-select: none;
       }
-
-      @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@1,700&display=swap');
-      
       .float-top-left{
         position: absolute;
         margin: 2px 0 0 7px;
@@ -25,9 +28,67 @@
         left: 0;
         z-index: 9999;
         color: rgba(255,255,255,1);
-      
-        font-family: 'Nunito', sans-serif;
+
         font-size: 22px;
+      }
+
+      .float-center {
+        position: absolute;
+        min-width: 50%;
+        min-height: 40%;
+        
+        left: 50%;
+        top: 50%;
+
+        margin-top: -10%;
+        margin-left: -25%;
+      }
+
+      #message-box {
+        z-index: 9999;
+        
+        border: 0;
+        border-radius: 5px;
+        background-color: rgba(255,255,255,1);
+
+        text-align: center;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      #message-box h1{
+        margin: 20px 0 0 0;
+        padding: 0;
+      }
+
+      #message-box  p{
+        margin: 0;
+        padding: 0;
+      }
+
+      .play-again-box{
+        width: 90%;
+        height: 50px;
+        margin: 5% 0;
+      }
+      .play-again-box button{
+        width: 100%;
+        height: 100%;
+
+        border: 0;
+        border-radius: 10px;
+
+        position
+        bottom: 10px;
+
+        transition: background-color 200ms;
+      }
+
+      .play-again-box button:hover{
+        background: rgba(0,0,0,0.7)
       }
     </style>
 
@@ -39,10 +100,22 @@
   </head>
   <body>
     <p class="float-top-left">Score: <span id="score">0</span></p>
+    
+    <div id="message-box" class="float-center">
+      <div class="info-box">
+        <h1 id="game-over-points">0</h1>
+        <p>points</p>
+      </div>
+
+      <div class="play-again-box">
+        <button id="play-again-button">Start Game</button>
+      </div>
+    </div>
+
     <canvas id="game-area"></canvas>
     
       
-    <script>
+    <script> // Game
       //Import the game area
       const canvas = document.getElementById('game-area');
 
@@ -54,20 +127,13 @@
       const scoreUI = document.getElementById('score')
       let score = 0; 
       let AddToScore = 0;
-
-      function updateScore(){
-        
-          if(score < AddToScore){
-            score += 10
-            requestAnimationFrame(updateScore)
-          }else{
-            score = AddToScore;
-            cancelAnimationFrame(updateScore)
-          }
-
-          scoreUI.innerHTML = score
-       }
       
+      //Import message-box and elements
+      const msgBox = document.getElementById('message-box')
+      const msgScore = document.getElementById('game-over-points')
+      const msgButton = document.getElementById('play-again-button')
+
+      msgBox.style.display = 'flex'
 
       // prefabs or class {}
       class playerPrefab {
@@ -124,13 +190,14 @@
       }
 
       class particlePrefab {
-        constructor(x, y, radius, color, speed){ 
+        constructor(x, y, radius, color, speed, alphaRate){ 
           this.x = x
           this.y = y
           this.radius = radius
           this.color = color
           this.speed = speed
           this.apha = 1
+          this.alphaRate = alphaRate
 
           this.friction = 0.98
         }
@@ -151,7 +218,7 @@
           this.speed.y *= this.friction
           this.x = this.x + this.speed.x
           this.y = this.y + this.speed.y
-          this.apha -= 0.015
+          this.apha -= this.alphaRate
         }
       }
 
@@ -180,26 +247,60 @@
       }
       // END: prefabs
 
-      const player = new playerPrefab((canvas.width / 2),(canvas.height / 2)
+      let player = new playerPrefab((canvas.width / 2),(canvas.height / 2)
       ,10,'white')
       
-      const enemies = []
-      const shoots = []
-      const particles = []
+      let enemies = []
+      let shoots = []
+      let particles = []
 
+      let enableSpawn
+
+
+      //Clear all and init
+      function initialState () {
+
+        player = new playerPrefab(
+          (canvas.width / 2),
+          (canvas.height / 2),
+          10,
+          'white'
+        )
+
+        shoots = []
+        particles = []
+        enemies = []
+
+        score = 0
+        AddToScore = score
+        scoreUI.innerHTML = score
+      }
+
+      function updateScore(){
+
+        const update = requestAnimationFrame(updateScore)
+
+        if(score < AddToScore){
+          score += 10
+        }else{
+          score = AddToScore;
+          cancelAnimationFrame(update)
+         }
+
+        scoreUI.innerHTML = score
+      }
+      
       function spawnEnemys() {
-        setInterval( () => {
-          
+        
+        const spawn = setInterval( () => {
+        
           const color = `hsl(${Math.random() * 360}, 50%, 50%)`
           const velocity = 0.9
-
           const radius = Math.random() * (30 - 6) + 6
-          
           const pos = {
             x: 0, 
             y: 0
           }
-
           if(Math.random() > 0.5){
             pos.x = Math.random()  < 0.5 ? 0 - radius : canvas.width + radius
             pos.y = Math.random() * canvas.height
@@ -211,15 +312,19 @@
             x: player.x, 
             y: player.y
           }
-          
           enemies.push(new enemyPrefab(
             pos.x, pos.y, radius, color,targetInitial, velocity))
+
+          if(!enableSpawn){
+           clearInterval(spawn)
+          }
         }, 1200)
-  
+        
       }
 
-      // Print a frame or animate()
       function animate() {
+        const animation = requestAnimationFrame(animate)
+
         ctx.fillStyle = "rgba(0, 0, 0, 0.1)" 
         ctx.fillRect(0,0,canvas.width,canvas.height)
         
@@ -247,22 +352,26 @@
           }
         })
 
-        enemies.forEach((enemy, eIndex) => {
+        enemies.forEach((enemy, index) => {
           enemy.update()
-
+          
           const distPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y)
 
           // Game Over
           if(distPlayer - enemy.radius - player.radius < 1)
           {
-            cancelAnimationFrame(animate)
+           
+            cancelAnimationFrame(animation)
+            enableSpawn = false
+            msgBox.style.display = 'flex'
+            msgScore.innerHTML = score
           }
 
            // Check the collision between shots and enemies
-          shoots.forEach((shoot , sIndex) => {
-    
+          shoots.forEach((shoot , shootIndex) => {  
             const dist = Math.hypot(shoot.x - enemy.x, shoot.y - enemy.y)
 
+            //If enemy-shoot collision
             if(dist - enemy.radius - shoot.radius < 1)
             {
 
@@ -270,48 +379,48 @@
                 shoot.y - enemy.y, 
                 shoot.x - enemy.x)
               
-              
+              //Emit particles
               for(let i=0; i < enemy.radius; i++){
 
-                //Emit particles if collision
                 particles.push(new particlePrefab(
                   shoot.x,shoot.y, Math.random() * 2.3 , enemy.color, {
-                    x: (-enemy.speed.x) + shoot.speed.x * (Math.random() -0.5)  / 2.3,
-                    y: (-enemy.speed.y) + shoot.speed.x * (Math.random() -0.5) / 2.3
-                    }
+                    x: (-enemy.speed.x) + shoot.speed.x * (Math.random() -0.5)  / 3,
+                    y: (-enemy.speed.y) + shoot.speed.x * (Math.random() -0.5) / 3
+                    }, 0.0067
                 ))
               }
-                 
-              
-              if(enemy.radius -10 > 10)
+              //Check (radius,delete) 
+              if(enemy.radius -8 > 8)
               {
-                AddToScore += 50
-                updateScore()
-
                 gsap.to(enemy, {
-                radius: enemy.radius -10
+                radius: enemy.radius - 8
                 })
             
                 setTimeout(() => {
-                  shoots.splice(sIndex, 1)
+                  shoots.splice(shootIndex, 1)
                 }, 0)
+
+                AddToScore += 50
+                updateScore()
+
               }else{
+                setTimeout(() => {
+                  enemies.splice(index, 1)
+                  shoots.splice(shootIndex, 1)
+                }, 0)
+
                 AddToScore += 100
                 score += 20
                 updateScore()
-
-                setTimeout(() => {
-                  enemies.splice(eIndex, 1)
-                  shoots.splice(sIndex, 1)
-                }, 0)
               }
             }
           })
         })
-        requestAnimationFrame(animate)
       }
 
       // Listen to user clicks
+
+      
       addEventListener('click', (event) => {
         const angle = Math.atan2(
           event.clientY - canvas.height / 2, 
@@ -321,16 +430,33 @@
             x: Math.cos(angle) * 8,
             y: Math.sin(angle) * 8
         }
-        shoots.push(new shootPrefab(
-            canvas.width / 2, 
-            canvas.height / 2, 
+        
+        const shoot = shoots.push(new shootPrefab(
+            player.x, 
+            player.y, 
             4,'white', speed
         ))
+
+        for(let i=0; i < 8; i++){
+          particles.push(new particlePrefab(
+            player.x + speed.x, player.y + speed.y , Math.random() * 2.8 , 'white', {
+              x: (speed.x / 12) * Math.random(), 
+              y: (speed.y / 12) * Math.random()}, 0.0067
+          ))
+        }
+
       })
 
-     //Start animation and spawn
-      animate()
-      spawnEnemys()
+     msgButton.addEventListener('click', () =>{
+        initialState()
+        animate()
+
+        enableSpawn = true
+        spawnEnemys()
+        msgBox.style.display = 'none'
+        
+      })
+     
 
     //Diconnect
     socket.on('max-connections-error', (message) =>{
