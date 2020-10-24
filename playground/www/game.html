@@ -137,11 +137,12 @@
 
       // prefabs or class {}
       class playerPrefab {
-        constructor(x, y, radius, color){ 
+        constructor(x, y, radius, color, velocity){ 
           this.x = x
           this.y = y
           this.radius = radius
           this.color = color
+          this.velocity = velocity
         }
 
         draw(){
@@ -248,13 +249,14 @@
       // END: prefabs
 
       let player = new playerPrefab((canvas.width / 2),(canvas.height / 2)
-      ,10,'white')
+      ,10,'white', 10)
       
       let enemies = []
       let shoots = []
       let particles = []
 
       let enableSpawn
+      let connected = true
 
 
       //Clear all and init
@@ -418,13 +420,11 @@
         })
       }
 
-      // Listen to user clicks
-
-      
+      // Listen to user clicks 
       addEventListener('click', (event) => {
         const angle = Math.atan2(
-          event.clientY - canvas.height / 2, 
-          event.clientX - canvas.width / 2)
+          event.clientY - player.y, 
+          event.clientX - player.x)
         
         const speed = {
             x: Math.cos(angle) * 8,
@@ -447,7 +447,7 @@
 
       })
 
-     msgButton.addEventListener('click', () =>{
+      msgButton.addEventListener('click', () =>{
         initialState()
         animate()
 
@@ -456,13 +456,49 @@
         msgBox.style.display = 'none'
         
       })
-     
 
-    //Diconnect
-    socket.on('max-connections-error', (message) =>{
-      alert(message)
-      socket.disconnect()
-    })
+      //Keyboard input controller
+
+      const controller = {
+        down: false,
+        left:false,
+        right:false,
+        up:false,
+
+        listener: function(event) {
+
+          let isPressed = (event.type == "keydown")? true: false;
+            console.log(key_state)
+            switch(event.keyCode) {
+            
+            case 65:// left key
+              console.log("left")
+              controller.left = isPressed;
+              break;
+            case 87:// up key
+              controller.up = isPressed;
+              break;
+            case 68:// right key
+              controller.right = isPressed;
+              break;
+            case 37:// left key
+              controller.left = isPressed;
+              break;
+            case 83:// down key
+              controller.down = isPressed;
+              break;
+        
+      }}}
+
+      addEventListener("keydown", controller.listener)
+      addEventListener("keyup", controller.listener);
+
+
+      //Diconnect
+      socket.on('max-connections-error', (message) =>{
+        alert(message)
+        socket.disconnect()
+      })
     </script>
   </body>
 </html>
