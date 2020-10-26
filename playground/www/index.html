@@ -50,13 +50,19 @@
     <p>Velocidade: <span id="vel"></span></p>
   </div>
 
-	<script>
-		// Import <canvas> and HTML context
+	<script type="module">
+    // Import Scripts
+    import createPlanets from './createPlanets.js'
+    
+		//Import <canvas> and HTML context
     const canvas = document.getElementById('game-area')
     canvas.width = innerWidth
     canvas.height = innerHeight
 
     const ctx    = canvas.getContext('2d')
+
+    const planet = createPlanets(ctx)
+    planet.spawPlanets(2, 600)
 
     //Import UI
     const velUI = document.getElementById('vel')
@@ -169,6 +175,7 @@
       ctx.fillRect(0,0,7000,7000)
       ctx.restore()
 
+
       //UI Update
       velUI.innerHTML = -Math.floor((playerShip.thrust.x * playerShip.thrust.y), -1)
 
@@ -177,7 +184,12 @@
       ctx.setTransform(1, 0, 0, 1, -cam.x, -cam.y);
 
       ctx.beginPath()
-
+      
+      ctx.save()
+      planet.planets[0].draw()
+      console.log(playerShip.x, playerShip.y)
+      ctx.restore()
+     
       //Ships update
       drawShip(playerShip)
       moveShip(playerShip)
