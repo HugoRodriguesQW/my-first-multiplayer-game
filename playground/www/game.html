@@ -50,42 +50,112 @@
 
      // Game Prefabs
     class ship {
-      constructor (position, size, rotation, turnSpeed) {
+      constructor (position, size, rotation, turnSpeed, thrustSpeed,friction) {
         this.x = position.x
         this.y = position.y
         this.rotation = rotation
         this.radius = (size / 2)
         this.radian =  (this.rotation / 180 * Math.PI)
         this.turn = turnSpeed
+
+        this.thrusting = false,
+        this.decrease =  false,
+        this.rotate = 'none',
+        this.thrustSpeed = thrustSpeed == undefined? 5 : thrustSpeed
+        this.thrust = {x: 0, y: 0}
+        this.friction = friction == undefined? 0.45 : friction
       }
+
+      move()
+      {
+        this.x = this.x + this.thrust.x
+        this.y = this.y + this.thrust.y
+      }
+
+      engine()
+      {
+        if(this.thrusting)
+        {
+          this.thrust.x = this.thrust.x + this.thrustSpeed * Math.cos(this.radian) / fps
+          this.thrust.y = this.thrust.y - this.thrustSpeed * Math.sin(this.radian) / fps
+        }else if(!this.decrease){
+          this.thrust.x -= this.friction * this.thrust.x / fps
+          this.thrust.y -= this.friction * this.thrust.y / fps
+        }else if(this.decrease){
+          this.thrust.x = this.thrust.x - this.thrustSpeed * Math.cos(this.radian) / (fps*2)
+          this.thrust.y = this.thrust.y + this.thrustSpeed * Math.sin(this.radian) / (fps*2)
+        }
+
+        this.move()
+      }
+    }
+
+    class engineParticle {
+        constructor(x, y, radius, colors, speed, alphaRate, friciton){ 
+          this.x = x
+          this.y = y
+          this.radius = radius
+          this.colors = colors == undefined? ['red', 'yellow'] : colors
+          this.speed = speed
+          this.apha = 1
+          this.alphaRate = alphaRate
+
+          this.friction = friciton == undefined? 0.98 : friciton
+        }
+
+        draw(){
+          ctx.save()
+          ctx.globalAlpha = this.apha
+          ctx.beginPath()
+          ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1] 
+          
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
+          ctx.fill()
+          ctx.restore()
+        }
+
+        update() {
+          this.draw()
+          this.speed.x *= this.friction
+          this.speed.y *= this.friction
+          this.x = this.x + this.speed.x
+          this.y = this.y + this.speed.y
+          this.apha -= this.alphaRate
+        }
     }
 
     //Create Game Objects
     const playerShip = new ship({
       x: canvas.width/2, 
       y: canvas.height/2
-    }, 30, 90, 360)
+    }, 20, 90, 360, 2, 0.1)
 
+    const particles = []
+
+    //Settings
     const fps = 60
     const animation = setInterval(update, 1000 / fps)
 
     function update()
     {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)' 
+      //Context update
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)' 
       ctx.fillRect(0,0,canvas.width,canvas.height)
-
       ctx.beginPath()
-
+      
+      //Ships update
       drawShip(playerShip)
-
       moveShip(playerShip)
+      engineParticles(playerShip)
     }
 
-    function drawShip (ship){ 
+    function drawShip (ship)
+    { 
 
       ctx.lineWidth = ship.size / 20 
       ctx.strokeStyle = 'white'
       ctx.fillStyle = 'white'
+      
       
       ctx.moveTo(
         ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian)), 
@@ -102,10 +172,86 @@
         ship.y + ship.radius * (2 /3 * Math.sin(ship.radian) + Math.cos(ship.radian))
       )
 
+      if(ship.x < 0 - ship.radius){
+        ship.x = ship.radius + canvas.width
+      }
+      if(ship.x > canvas.width + ship.radius){
+        ship.x = 0
+      }
+      if(ship.y < 0 - ship.radius){
+        ship.y = ship.radius + canvas.height
+      }
+      if(ship.y > canvas.height + ship.radius){
+        ship.y = 0
+      }
+
       ctx.closePath()
       ctx.stroke()
       ctx.fill()
       
+    }
+
+    function engineParticles (ship)
+    { 
+       //Particles update
+      particles.forEach((particle, i) => {
+        if(particle.apha < 0){
+          particles.splice(i, 1)
+        }else{
+          particle.update()
+        }
+      })
+
+      // Main Engine
+      if(ship.thrusting)
+      {
+
+        const posX = ship.x - ship.radius * 4 /3 * Math.cos(ship.radian)
+        const posY = ship.y + ship.radius * 4 /3 * Math.sin(ship.radian)
+        
+        for(let i = 0; i < 5; i++){
+
+          particles.push(new engineParticle(
+            posX + Math.random(), posY + Math.random(), Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10), 
+            ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'], 
+            {x: posX - (ship.x + ship.thrust.x) + Math.random()* 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2}, 
+            0.4 * (Math.random() + 0.5)
+          ))
+        }
+      }
+
+      if(ship.decrease)
+      {
+        const posX = ship.x + ship.radius * 4 /3 * Math.cos(ship.radian) * 1.2
+        const posY = ship.y - ship.radius * 4 /3 * Math.sin(ship.radian) * 1.2
+
+        for(let i = 0; i < 5; i++){
+
+          particles.push(new engineParticle(
+            posX, posY, Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10), 
+            ['#ededed', '#c4c4c4'], 
+            {x: posX - (ship.x + ship.thrust.x) + Math.random()* 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2}, 
+            0.9 * (Math.random() + 0.5), 0.39
+          ))
+        }
+      }
+
+      //Rotate Engines
+      if(ship.rotation != 0){
+        const offset = ship.rotation > 0? - 80 : 80
+        const posX =  ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian+offset))
+        const posY =  ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian+offset))
+
+        for(let i = 0; i < 5; i++){
+
+          particles.push(new engineParticle(
+            posX, posY, Math.random() * (3), 
+            ['#ededed', '#c4c4c4'], 
+            {x: posX - (ship.x + ship.thrust.x) - Math.random(), y: posY - (ship.y + ship.thrust.y) - Math.random()}, 
+            0.9 * (Math.random() + 0.5), 0.28
+          ))
+        }
+      }
     }
 
     // Game Controller
@@ -141,18 +287,23 @@
     document.addEventListener('keyup', controller.listen)
 
 
-    function moveShip (ship){
+    function moveShip (ship)
+    {
       if(controller.increaseSpeed){
-
+        ship.thrusting = true
+      }else{
+        ship.thrusting = false
       }
       if(controller.decreaseSpeed){
-
-      }
+        ship.decrease = true
+      }else{
+         ship.decrease = false
+      } 
       if(controller.rotateLeft){
-        ship.rotation =  ship.turn / 180 * Math.PI / (fps * 2)
+        ship.rotation =  ship.turn / 180 * Math.PI / (fps * 1.2)
       }
       if(controller.rotateRight){
-        ship.rotation = - ship.turn / 180 * Math.PI / (fps * 2)
+        ship.rotation = - ship.turn / 180 * Math.PI / (fps * 1.2)
       }
 
       if(!controller.rotateLeft && !controller.rotateRight){
@@ -160,6 +311,7 @@
       }
 
       ship.radian = ship.radian + ship.rotation
+      ship.engine()
     }
 
     update()
