@@ -1,10 +1,9 @@
-const app = require('express')()
+const express = require('express')
+const app = express()
 const server = require('http').createServer(app)
 const sockets = require('socket.io')(server)
 
-app.get('/', (req, res)=> {
-  res.sendFile(__dirname+"/www/game.html")
-})
+app.use(express.static('www'))
 
 const game = makeGame()
 let maxConnections = 15;
