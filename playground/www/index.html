@@ -47,25 +47,30 @@
 
 	<canvas id="game-area"></canvas>
   <div id="speed">
-    <p>Velocidade: <span id="vel"></span></p>
+    <p>Posição Espacial:</p>
+    <p>X:<span id="posX"></span></p>
+    <p>Y:<span id="posY"></span></p>
   </div>
 
 	<script type="module">
-    // Import Scripts
-    import createPlanets from './createPlanets.js'
+    import createMap from './map.js'
     
-		//Import <canvas> and HTML context
+		// Import <canvas> and HTML context
     const canvas = document.getElementById('game-area')
     canvas.width = innerWidth
     canvas.height = innerHeight
-
     const ctx    = canvas.getContext('2d')
 
-    const planet = createPlanets(ctx)
-    planet.spawPlanets(2, 600)
+    // Import game map
+    const mapSize = {width: 7000, height: 7000}
+    const map = createMap(ctx, mapSize)
+    map.spawPlanets(4, 300)
 
-    //Import UI
-    const velUI = document.getElementById('vel')
+    // Import UI
+    const posUI = {
+      x: document.getElementById('posX'),
+      y: document.getElementById('posY')
+    }
 
     const cam = {
       x: 0,
@@ -78,7 +83,7 @@
       }
     }
 
-     // Game Prefabs
+    // Game Prefabs
     class ship {
       constructor (position, size, rotation, turnSpeed, thrustSpeed,friction) {
         this.x = position.x
@@ -121,37 +126,34 @@
     }
 
     class engineParticle {
-        constructor(x, y, radius, colors, speed, alphaRate, friciton){ 
-          this.x = x
-          this.y = y
-          this.radius = radius
-          this.colors = colors == undefined? ['red', 'yellow'] : colors
-          this.speed = speed
-          this.apha = 1
-          this.alphaRate = alphaRate
-
-          this.friction = friciton == undefined? 0.98 : friciton
-        }
-
-        draw(){
-          ctx.save()
-          ctx.globalAlpha = this.apha
-          ctx.beginPath()
-          ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1] 
-          
-          ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
-          ctx.fill()
-          ctx.restore()
-        }
-
-        update() {
-          this.draw()
-          this.speed.x *= this.friction
-          this.speed.y *= this.friction
-          this.x = this.x + this.speed.x
-          this.y = this.y + this.speed.y
-          this.apha -= this.alphaRate
-        }
+      constructor(x, y, radius, colors, speed, alphaRate, friciton){ 
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.colors = colors == undefined? ['red', 'yellow'] : colors
+        this.speed = speed
+        this.apha = 1
+        this.alphaRate = alphaRate
+        this.friction = friciton == undefined? 0.98 : friciton
+      }
+      draw(){
+        ctx.save()
+        ctx.globalAlpha = this.apha
+        ctx.beginPath()
+        ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1] 
+        
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
+        ctx.fill()
+        ctx.restore()
+      }
+      update() {
+        this.draw()
+        this.speed.x *= this.friction
+        this.speed.y *= this.friction
+        this.x = this.x + this.speed.x
+        this.y = this.y + this.speed.y
+        this.apha -= this.alphaRate
+      }
     }
 
     //Create Game Objects
@@ -162,43 +164,49 @@
 
     const particles = []
 
+    
+
+
     //Settings
     const fps = 60
     const animation = setInterval(update, 1000 / fps)
+    
+
+
 
     // Animation Function
+    
     function update()
     { 
-      ctx.save()
-      //Space update
+      // Space update
       ctx.fillStyle = 'rgba(0, 0, 0, 0.7)' 
-      ctx.fillRect(0,0,7000,7000)
-      ctx.restore()
-
-
-      //UI Update
-      velUI.innerHTML = -Math.floor((playerShip.thrust.x * playerShip.thrust.y), -1)
-
-      //Camera Update
-      cam.follow(playerShip)
-      ctx.setTransform(1, 0, 0, 1, -cam.x, -cam.y);
-
-      ctx.beginPath()
+      ctx.fillRect(0,0,mapSize.width,mapSize.height)
       
-      ctx.save()
-      planet.planets[0].draw()
-      console.log(playerShip.x, playerShip.y)
-      ctx.restore()
-     
-      //Ships update
+      // Ships update
       drawShip(playerShip)
       moveShip(playerShip)
       engineParticles(playerShip)
+
+      // Camera update
+      cam.follow(playerShip)
+      ctx.setTransform(1, 0, 0, 1, -cam.x, -cam.y);
+
+       // Map update
+      map.planets.forEach((planet) => {
+        planet.draw()
+      })
+
+      // Map update
+      map.planets[0].draw()
+
+      //UI Update
+      posUI.x.innerHTML = Math.round(playerShip.x)
+      posUI.y.innerHTML = Math.round(playerShip.y)
     }
 
     function drawShip (ship)
     { 
-
+      ctx.beginPath()
       ctx.lineWidth = ship.size / 20 
       ctx.strokeStyle = 'white'
       ctx.fillStyle = 'white'
@@ -220,15 +228,15 @@
       )
 
       if(ship.x < 0 - ship.radius){
-        ship.x = 6000
+        ship.x = mapSize.width
       }
-      if(ship.x > 6000 + ship.radius){
+      if(ship.x > mapSize.width + ship.radius){
         ship.x = 0
       }
       if(ship.y < 0 - ship.radius){
-        ship.y = 6000
+        ship.y = mapSize.height
       }
-      if(ship.y > 6000 + ship.radius){
+      if(ship.y >  mapSize.height + ship.radius){
         ship.y = 0
       }
 
