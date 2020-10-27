@@ -6,11 +6,19 @@ export default function createMap (ctx, mapSize)
     this.y = y
     this.radius = radius
     this.color = color
+
+    this.orbitRange = this.radius * 1.8
+    this.mass = 700000
     }
 
-    draw(){
+    draw()
+    {
+      ctx.fillStyle = 'red'
       ctx.beginPath()
-      
+      ctx.fill();
+      ctx.beginPath()
+      ctx.arc(this.x, this.y, 20, 0, Math.PI*2, false)
+
       var  grd = ctx.createRadialGradient(
       this.x, this.y, this.radius / 4, this.x,this.y, this.radius * 1.6);
       grd.addColorStop(0, `hsla(${this.color}, 100%, 65%, 1)`);
@@ -32,7 +40,7 @@ export default function createMap (ctx, mapSize)
       ctx.fill()
     }
   }
-
+ 
   const planets = []
 
   function spawPlanets(quant, maxSize) {
@@ -44,8 +52,8 @@ export default function createMap (ctx, mapSize)
       const radius = (Math.random() + 0.5) * maxSize
       const padding =  4 * radius
       const spawArea = {
-        x: mapSize.width - padding,
-        y: mapSize.height - padding
+        x: mapSize.width / padding,
+        y: mapSize.height / padding
       }
 
       // Choose a position
@@ -60,10 +68,10 @@ export default function createMap (ctx, mapSize)
       }
 
       console.log('planet: ', 'x: ' + Math.round(pos.x), 'y: '+ Math.round(pos.y))
-
+      
       planets.push(new planet(
-       pos.x,
-       pos.y,
+      1000,
+       1000,
          radius,
          Math.random() * 360
       ))
