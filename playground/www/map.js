@@ -8,7 +8,9 @@ export default function createMap (ctx, mapSize)
     this.color = color
 
     this.orbitRange = this.radius * 1.8
-    this.mass = 700000
+    this.mass = 700000,
+    this.force = 0,
+    this.velocity = {x: 0, y: 0}
     }
 
     draw()

@@ -1,33 +1,27 @@
 export default function makeGravity(obj1, obj2) {
   
+var attraction = function(p2, p1) {
+    p2 = obj2 // planet
+    p1 = obj1 // ship
+    // Distance to other body
+    var dx = p2.x - p1.x;
+    var dy = p2.y - p1.y;
+    var d = Math.sqrt(dx ** 2 + dy ** 2); // Possibly correct
 
-var newtonsLawOfUniversalGravitation = function (mass1, mass2, distance) {
- var force =  9.81 * ((mass1 * mass2) / Math.pow(distance, 2));
- var attraction2 = force / mass2;
- return attraction2;
-};
+    // Force of attracrtion
+    var f = 9.87 * (p1.mass * p2.mass) / (d ** 2); // Possibly Correct
 
-var getDistance = function (x1, y1, x2, y2) {
- var a = Math.abs(x1 - x2);
- var b = Math.abs(y1 - y2);
- return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-};
+    // Direction of force, If you read it hard enough you should be able to hear my screams of pain
+    // Not sure if this is correct, most likely not.
+    var theta = Math.atan2(dy, dx);
+    var fx = Math.cos(theta) * f ;
+    var fy = Math.sin(theta) * f ;
 
-var getDirection = function (x1, y1, x2, y2, attraction) {
-  var direction = Math.atan2(x1 - x2, y1 - y2);
-  var attractionX = Math.sin(direction) * attraction;
-  var attractionY = Math.cos(direction) * attraction;
-  return {x: attractionX, y: attractionY, dir: direction}
-  
+    p1.velocity.x += fx / p1.mass;
+    p1.velocity.y += fy / p1.mass;
+
+    p1.x += p1.velocity.x;
+    p1.y += p1.velocity.y;
 }
 
-var distance = getDistance(obj1.x,obj1.y, obj2.x, obj2.y)
-var newtons = newtonsLawOfUniversalGravitation(obj1.mass, obj2.mass, distance)
-var direction = getDirection(obj1.x,obj1.y, obj2.x, obj2.y, newtons)
-
-return{
-  direction,
-  distance,
-  newtons
-}
 }

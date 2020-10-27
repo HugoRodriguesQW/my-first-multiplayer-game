@@ -108,15 +108,14 @@
         this.thrust = {x: 0, y: 0}
         this.friction = friction == undefined? 0.45 : friction
 
-        this.mass = 2000,
-        this.orbit = {direction: {x:0,y:0}, newtons: 0,distance: 0}
+        this.mass = 100,
+        this.velocity = {x:0,y:0}
       }
 
       move()
       {
-        this.x = this.x - this.orbit.direction.x * 20 + this.thrust.x
-        this.y = this.y - this.orbit.direction.x * 20 + this.thrust.y
-        console.log(this.orbit.direction.x * 1000)
+        this.x = this.x + this.thrust.x 
+        this.y = this.y + this.thrust.y
       }
 
       engine()
@@ -204,7 +203,8 @@
         planet.draw()
       })
 
-      playerShip.orbit = makeGravity(playerShip, map.planets[0])
+      //playerShip.orbit = makeGravity(playerShip, map.planets[0])
+      makeGravity(playerShip, map.planets[0])
 
       //UI Update
       posUI.x.innerHTML = Math.round(playerShip.x)
