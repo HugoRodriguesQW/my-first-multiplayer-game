@@ -1,5 +1,7 @@
 export default function makeGravity(obj, planet) {
 
+
+
 function attraction (p1, p2) {
 
     // Distance to other body

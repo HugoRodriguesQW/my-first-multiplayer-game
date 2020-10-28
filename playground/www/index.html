@@ -57,6 +57,9 @@
     <p>Posição Espacial:</p>
     <p class="color-red">X: <span id="posX"></span></p>
     <p class="color-green">Y: <span id="posY"></span></p>
+    <div id="GravCampAlert">
+      <p id="campAlt"></p>
+    </div>
   </div>
 
 	<script type="module">
@@ -70,14 +73,18 @@
     const ctx    = canvas.getContext('2d')
 
     // Import game map
-    const mapSize = {width: 7000, height: 7000}
+    const mapSize = {width: 10000, height: 10000}
     const map = createMap(ctx, mapSize)
-    map.spawPlanets(1, 300)
+    map.spawPlanets(4, 300)
 
     // Import UI
     const posUI = {
       x: document.getElementById('posX'),
       y: document.getElementById('posY')
+    }
+    const campAlert = {
+      box: document.getElementById('GravCampAlert'),
+      alt: document.getElementById('campAlt')
     }
 
     const cam = {
@@ -112,7 +119,8 @@
         this.velocity = {x:0,y:0}
         this.theta = 0
         this.orbitHeight = 0
-        this.dirCorretion = {x: 0, y: 0}
+        this.dirCorretion = {x: 0, y: 0},
+        this.Orbiting = []
       }
 
       move()
@@ -122,7 +130,6 @@
 
         this.x = this.x + this.velocity.x
         this.y = this.y + this.velocity.y
-        console.log('Angulo: ' +this.theta, 'Hipotenusa: '+ this.orbitHeight, 'corr: ', this.dirCorretion.x, this.dirCorretion.y)
       }
 
       engine()
@@ -159,7 +166,7 @@
         ctx.beginPath()
         ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1]
 
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
+        ctx.arc(this.x, this.y, this.radius <0? this.radius * -1: this.radius, 0, Math.PI*2, false)
         ctx.fill()
         ctx.restore()
       }
@@ -179,12 +186,19 @@
       y: canvas.height/2
     }, 20, 90, 360, 2, 0.1)
 
+    const spaceShips = []
     const particles = []
     //Settings
     const fps = 30
     const animation = setInterval(update, 1000 / fps)
 
 
+    spaceShips.push(playerShip)
+
+     const otherShip = new ship({
+      x: canvas.width/2,
+      y: canvas.height/2
+    }, 20, 90, 360, 2, 0.1)
 
 
     // Animation Function
@@ -206,16 +220,51 @@
       ctx.setTransform(1, 0, 0, 1, -cam.x, -cam.y);
 
        // Map update
-      map.planets.forEach((planet) => {
+
+      map.planets.forEach((planet, index) => {
+         const dist = Math.hypot(Math.sqrt((planet.x - playerShip.x) ** 2 + (planet.y - playerShip.y) ** 2))
+          if(dist-planet.radius < planet.orbitRange)
+          {
+            playerShip.Orbiting.push(planet);
+            campAlert.alt.innerHTML = 'Altitude: '+ (dist - planet.radius).toFixed(1) + ' Km'
+          }else if(playerShip.Orbiting.length == 0){
+            campAlert.alt.innerHTML = ''
+          }
         planet.draw()
       })
+      playerShip.Orbiting = []
+      console.log(playerShip.Orbiting.length)
 
-      //playerShip.orbit = makeGravity(playerShip, map.planets[0])
-      makeGravity(playerShip, map.planets[0])
+      //Gravity Updates
+      spaceShips.forEach((ship) => {
+        map.planets.forEach((planet) => {
+          const dist = Math.hypot(Math.sqrt((planet.x - ship.x) ** 2 + (planet.y - ship.y) ** 2))
+          if(dist-planet.radius < planet.orbitRange)
+          {
+            makeGravity(playerShip, planet)
+          }
+        })
+      })
 
       //UI Update
-      posUI.x.innerHTML = Math.round(playerShip.x)
-      posUI.y.innerHTML = Math.round(playerShip.y)
+      posUI.x.innerHTML = (playerShip.thrust.x + playerShip.velocity.x).toFixed(2) + ' Km/s'
+      posUI.y.innerHTML = (playerShip.thrust.y + playerShip.velocity.y).toFixed(2) + ' Km/s'
+
+      ctx.beginPath()
+      ctx.fillStyle = 'white'
+      ctx.font = "10px Nunito"
+      ctx.textAlign = 'end'
+      ctx.direction = 'rtl'
+      ctx.fillText(
+        '< ' + playerShip.x.toFixed(1) + ' X >',
+         playerShip.x - canvas.width/2 + 50,  playerShip.y
+        )
+      ctx.textAlign = 'center'
+      ctx.fillText(
+        '< ' + playerShip.y.toFixed(1) + ' Y >',
+       playerShip.x, playerShip.y + canvas.height/2 -50
+        )
+
     }
 
     function drawShip (ship)
