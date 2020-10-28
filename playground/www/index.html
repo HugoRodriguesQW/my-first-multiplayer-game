@@ -41,11 +41,11 @@
     }
 	</style>
 
-	<script src="/socket.io/socket.io.js"></script>
+	<!--<script src="/socket.io/socket.io.js"></script>-->
 	<script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
   <script>
-		const socket = io();
+		//const socket = io(); Temporally
 	</script>
 
 </head>
@@ -62,7 +62,7 @@
 	<script type="module">
     import createMap from './map.js'
     import makeGravity from './gravity.js'
-    
+
 		// Import <canvas> and HTML context
     const canvas = document.getElementById('game-area')
     canvas.width = innerWidth
@@ -86,7 +86,7 @@
       width: canvas.width,
       height: canvas.height,
       follow: function (target) {
-          this.x = target.x - (canvas.width/2) 
+          this.x = target.x - (canvas.width/2)
           this.y = target.y - (canvas.height/2)
       }
     }
@@ -108,14 +108,21 @@
         this.thrust = {x: 0, y: 0}
         this.friction = friction == undefined? 0.45 : friction
 
-        this.mass = 100,
+        this.mass = this.radius * 2
         this.velocity = {x:0,y:0}
+        this.theta = 0
+        this.orbitHeight = 0
+        this.dirCorretion = {x: 0, y: 0}
       }
 
       move()
       {
-        this.x = this.x + this.thrust.x 
+        this.x = this.x + this.thrust.x
         this.y = this.y + this.thrust.y
+
+        this.x = this.x + this.velocity.x
+        this.y = this.y + this.velocity.y
+        console.log('Angulo: ' +this.theta, 'Hipotenusa: '+ this.orbitHeight, 'corr: ', this.dirCorretion.x, this.dirCorretion.y)
       }
 
       engine()
@@ -125,8 +132,8 @@
           this.thrust.x = this.thrust.x + this.thrustSpeed * Math.cos(this.radian) / fps
           this.thrust.y = this.thrust.y - this.thrustSpeed * Math.sin(this.radian) / fps
         }else if(!this.decrease){
-          this.thrust.x -= this.friction * this.thrust.x / fps
-          this.thrust.y -= this.friction * this.thrust.y / fps
+          //this.thrust.x -= this.friction * this.thrust.x / fps Disabled.
+          //this.thrust.y -= this.friction * this.thrust.y / fps Gravity doesn't work with that
         }else if(this.decrease){
           this.thrust.x = this.thrust.x - this.thrustSpeed * Math.cos(this.radian) / (fps*2)
           this.thrust.y = this.thrust.y + this.thrustSpeed * Math.sin(this.radian) / (fps*2)
@@ -136,7 +143,7 @@
     }
 
     class engineParticle {
-      constructor(x, y, radius, colors, speed, alphaRate, friciton){ 
+      constructor(x, y, radius, colors, speed, alphaRate, friciton){
         this.x = x
         this.y = y
         this.radius = radius
@@ -150,8 +157,8 @@
         ctx.save()
         ctx.globalAlpha = this.apha
         ctx.beginPath()
-        ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1] 
-        
+        ctx.fillStyle = Math.random() < 0.5? this.colors[0] : this.colors[1]
+
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
         ctx.fill()
         ctx.restore()
@@ -168,7 +175,7 @@
 
     //Create Game Objects
     const playerShip = new ship({
-      x: canvas.width/2, 
+      x: canvas.width/2,
       y: canvas.height/2
     }, 20, 90, 360, 2, 0.1)
 
@@ -176,19 +183,19 @@
     //Settings
     const fps = 30
     const animation = setInterval(update, 1000 / fps)
-    
+
 
 
 
     // Animation Function
-    
+
     function update()
-    { 
-     
+    {
+
       // Space update
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)' 
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
       ctx.fillRect(0,0,mapSize.width,mapSize.height)
-      
+
       // Ships update
       drawShip(playerShip)
       moveShip(playerShip)
@@ -212,25 +219,25 @@
     }
 
     function drawShip (ship)
-    { 
+    {
       ctx.beginPath()
-      ctx.lineWidth = ship.size / 20 
+      ctx.lineWidth = ship.size / 20
       ctx.strokeStyle = 'white'
       ctx.fillStyle = 'white'
-      
-      
+
+
       ctx.moveTo(
-        ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian)), 
+        ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian)),
         ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian))
       )
 
       ctx.lineTo(
-        ship.x - ship.radius * (2 /3 * Math.cos(ship.radian) + Math.sin(ship.radian)), 
+        ship.x - ship.radius * (2 /3 * Math.cos(ship.radian) + Math.sin(ship.radian)),
         ship.y + ship.radius * (2 /3 * Math.sin(ship.radian) - Math.cos(ship.radian))
       )
 
       ctx.lineTo(
-        ship.x - ship.radius * (2 /3 * Math.cos(ship.radian) - Math.sin(ship.radian)), 
+        ship.x - ship.radius * (2 /3 * Math.cos(ship.radian) - Math.sin(ship.radian)),
         ship.y + ship.radius * (2 /3 * Math.sin(ship.radian) + Math.cos(ship.radian))
       )
 
@@ -250,11 +257,11 @@
       ctx.closePath()
       ctx.stroke()
       ctx.fill()
-      
+
     }
 
     function engineParticles (ship)
-    { 
+    {
        //Particles update
       particles.forEach((particle, i) => {
         if(particle.apha < 0){
@@ -270,13 +277,13 @@
 
         const posX = ship.x - ship.radius * 4 /3 * Math.cos(ship.radian)
         const posY = ship.y + ship.radius * 4 /3 * Math.sin(ship.radian)
-        
+
         for(let i = 0; i < 5; i++){
 
           particles.push(new engineParticle(
-            posX + Math.random(), posY + Math.random(), Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10), 
-            ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'], 
-            {x: posX - (ship.x + ship.thrust.x) + Math.random()* 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2}, 
+            posX + Math.random(), posY + Math.random(), Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10),
+            ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'],
+            {x: posX - (ship.x) + Math.random()* 2, y: posY - (ship.y) + Math.random() * 2},
             0.4 * (Math.random() + 0.5)
           ))
         }
@@ -290,9 +297,9 @@
         for(let i = 0; i < 5; i++){
 
           particles.push(new engineParticle(
-            posX, posY, Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10), 
-            ['#ededed', '#c4c4c4'], 
-            {x: posX - (ship.x + ship.thrust.x) + Math.random()* 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2}, 
+            posX, posY, Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10),
+            ['#ededed', '#c4c4c4'],
+            {x: posX - (ship.x + ship.thrust.x) + Math.random()* 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2},
             0.9 * (Math.random() + 0.5), 0.39
           ))
         }
@@ -307,25 +314,25 @@
         for(let i = 0; i < 5; i++){
 
           particles.push(new engineParticle(
-            posX, posY, Math.random() * (3), 
-            ['#ededed', '#c4c4c4'], 
-            {x: posX - (ship.x + ship.thrust.x) - Math.random(), y: posY - (ship.y + ship.thrust.y) - Math.random()}, 
+            posX, posY, Math.random() * (3),
+            ['#ededed', '#c4c4c4'],
+            {x: posX - (ship.x + ship.thrust.x) - Math.random(), y: posY - (ship.y + ship.thrust.y) - Math.random()},
             0.9 * (Math.random() + 0.5), 0.28
           ))
         }
       }
     }
-      
+
     // Game Controller
     const controller = {
       increaseSpeed : false,
       decreaseSpeed : false,
       rotateLeft : false,
       rotateRight : false,
-      
+
       listen: function(command){
         let isPressed = command.type === 'keydown'?  true : false
-      
+
         switch(command.keyCode){
           case 87:
             controller.increaseSpeed = isPressed
@@ -358,9 +365,9 @@
         ship.decrease = true
       }else{
          ship.decrease = false
-      } 
+      }
       if(controller.rotateLeft){
-        ship.rotation =  ship.turn / 180 * Math.PI / (fps * 1.2)
+        ship.rotation =  ship.turn  / 180 * Math.PI / (fps * 1.2)
       }
       if(controller.rotateRight){
         ship.rotation = - ship.turn / 180 * Math.PI / (fps * 1.2)
@@ -374,13 +381,14 @@
       ship.engine()
     }
 
+
     update()
 
     //Diconnect
-    socket.on('max-connections-error', (message) =>{
-      alert(message)
-      ocket.disconnect()
-    })
+    //socket.on('max-connections-error', (message) =>{
+      //alert(message)
+      //ocket.disconnect()
+    //})
 	</script>
 </body>
 

@@ -1,8 +1,7 @@
-export default function makeGravity(obj1, obj2) {
-  
-var attraction = function(p2, p1) {
-    p2 = obj2 // planet
-    p1 = obj1 // ship
+export default function makeGravity(obj, planet) {
+
+function attraction (p1, p2) {
+
     // Distance to other body
     var dx = p2.x - p1.x;
     var dy = p2.y - p1.y;
@@ -19,9 +18,9 @@ var attraction = function(p2, p1) {
 
     p1.velocity.x += fx / p1.mass;
     p1.velocity.y += fy / p1.mass;
+    p1.theta = theta
+    p1.orbitHeight = d - p2.radius
 
-    p1.x += p1.velocity.x;
-    p1.y += p1.velocity.y;
 }
-
+attraction(obj, planet)
 }

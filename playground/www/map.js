@@ -1,14 +1,14 @@
 export default function createMap (ctx, mapSize)
 {
   class planet {
-    constructor(x, y, radius, color){ 
+    constructor(x, y, radius, color){
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
 
     this.orbitRange = this.radius * 1.8
-    this.mass = 700000,
+    this.mass = this.radius  * 2,
     this.force = 0,
     this.velocity = {x: 0, y: 0}
     }
@@ -42,13 +42,13 @@ export default function createMap (ctx, mapSize)
       ctx.fill()
     }
   }
- 
+
   const planets = []
 
   function spawPlanets(quant, maxSize) {
 
-   
-    
+
+
     for(let i= 0; i < quant; i++){
       // Choose a radius
       const radius = (Math.random() + 0.5) * maxSize
@@ -70,7 +70,7 @@ export default function createMap (ctx, mapSize)
       }
 
       console.log('planet: ', 'x: ' + Math.round(pos.x), 'y: '+ Math.round(pos.y))
-      
+
       planets.push(new planet(
       1000,
        1000,
