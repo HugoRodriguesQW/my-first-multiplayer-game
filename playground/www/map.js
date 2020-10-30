@@ -1,45 +1,26 @@
-export default function createMap (ctx, mapSize)
-{
-  class planet {
-    constructor(x, y, radius, color){
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
+// Complete
 
-    this.orbitRange = this.radius * 2.5
-    this.mass = this.radius  * 2,
-    this.force = 0,
-    this.velocity = {x: 0, y: 0}
+export default function createMap() {
+  // Import game map
+  const mapSize = {
+    width: 10000,
+    height: 10000
+  }
+
+
+  class planet {
+    constructor(x, y, radius, color) {
+      this.x = x
+      this.y = y
+      this.radius = radius
+      this.color = color
+
+      this.orbitRange = this.radius * 2.5
+      this.mass = this.radius * 2
     }
 
-    draw()
-    {
-      ctx.fillStyle = 'red'
-      ctx.beginPath()
-      ctx.fill();
-      ctx.beginPath()
-      ctx.arc(this.x, this.y, 20, 0, Math.PI*2, false)
+    draw() {
 
-      var  grd = ctx.createRadialGradient(
-      this.x, this.y, this.radius / 4, this.x,this.y, this.radius * 1.3);
-      grd.addColorStop(0, `hsla(${this.color}, 100%, 65%, 1)`);
-      grd.addColorStop(1,`hsla(${this.color}, 100%, 37%, 0.01)`);
-
-      ctx.fillStyle = grd
-      ctx.arc(this.x, this.y, this.radius * 1.6, 0, Math.PI*2, false)
-      ctx.fill();
-
-      //draw a planet
-      ctx.beginPath()
-      grd = ctx.createRadialGradient(
-      this.x * 0.77, this.y * 0.75, this.radius / 2, this.x * 0.75,this.y * 0.75, this.radius * 1.75);
-      grd.addColorStop(0, `hsla(${this.color}, 100%, 20%,1)`);
-      grd.addColorStop(1,`hsla(${this.color}, 100%, 37%, 1)`);
-
-      ctx.fillStyle = grd
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
-      ctx.fill()
     }
   }
 
@@ -49,10 +30,10 @@ export default function createMap (ctx, mapSize)
 
 
 
-    for(let i= 0; i < quant; i++){
+    for (let i = 0; i < quant; i++) {
       // Choose a radius
       const radius = (Math.random() + 0.5) * maxSize
-      const padding =  4 * radius
+      const padding = 4 * radius
       const spawArea = {
         x: padding + (mapSize.width - (padding * 4)),
         y: padding + (mapSize.height - (padding * 4))
@@ -69,7 +50,7 @@ export default function createMap (ctx, mapSize)
         y: padding + (Math.random() * spawArea.y)
       }
 
-      console.log('planet: ', 'x: ' + Math.round(pos.x), 'y: '+ Math.round(pos.y))
+      console.log('Planet U-Position: ', 'x: ' + Math.round(pos.x), 'y: ' + Math.round(pos.y))
 
       planets.push(new planet(
         pos.x,
@@ -79,5 +60,5 @@ export default function createMap (ctx, mapSize)
       ))
     }
   }
-  return {planets, spawPlanets}
+  return { planets, spawPlanets, mapSize }
 }
