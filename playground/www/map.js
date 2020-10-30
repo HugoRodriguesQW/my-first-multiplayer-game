@@ -1,7 +1,7 @@
-// Complete
+// Beautiful, no dependencies
 
 export default function createMap() {
-  // Import game map
+
   const mapSize = {
     width: 10000,
     height: 10000
@@ -27,13 +27,13 @@ export default function createMap() {
   const planets = []
 
   function spawPlanets(quant, maxSize) {
+    console.log('MAP: planets spawner required...')
 
-
-
-    for (let i = 0; i < quant; i++) {
+    for (planets.length; planets.length < quant;) {
       // Choose a radius
       const radius = (Math.random() + 0.5) * maxSize
       const padding = 4 * radius
+
       const spawArea = {
         x: padding + (mapSize.width - (padding * 4)),
         y: padding + (mapSize.height - (padding * 4))
@@ -45,12 +45,23 @@ export default function createMap() {
         y: Math.random(),
       }
 
-      const pos = {
+      let pos = { x: 0, y: 0 }
+
+      const position = {
         x: padding + (Math.random() * spawArea.x),
         y: padding + (Math.random() * spawArea.y)
       }
 
-      console.log('Planet U-Position: ', 'x: ' + Math.round(pos.x), 'y: ' + Math.round(pos.y))
+      if (!planetsCollision(position, radius)) {
+        pos = position
+        console.log('MAP: Planet spawned at:')
+        console.log('MAP (Planet U-Position): ', 'x: ' + Math.round(pos.x), 'y: ' + Math.round(pos.y))
+      }
+      else {
+        console.log('MAP: Unable to generate. Trying again...')
+        spawPlanets(quant, maxSize)
+        break
+      }
 
       planets.push(new planet(
         pos.x,
@@ -59,6 +70,21 @@ export default function createMap() {
         Math.random() * 360
       ))
     }
+
   }
+
+
+  function planetsCollision(pos, radius) {
+    let collision = false
+
+    planets.forEach((planet) => {
+      const dist = Math.hypot(Math.sqrt((planet.x - pos.x) ** 2 + (planet.y - pos.y) ** 2))
+      if (dist < radius + planet.radius) {
+        collision = true
+      }
+    })
+    return collision
+  }
+
   return { planets, spawPlanets, mapSize }
 }

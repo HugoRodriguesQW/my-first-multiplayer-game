@@ -39,47 +39,24 @@
     import makeGravity from './gravity.js'
     import renderScreen from './render.js'
 
-
-    // HTML ELEMENTS
+    // HTML
     const area = document.getElementById('game-area')
     area.width = innerWidth
     area.height = innerHeight
+    const ctx = area.getContext('2d')
 
-    console.log('Game Area ready')
+    const map = createMap()
+    map.spawPlanets(3,600)
 
-    const onMap = createMap()
+    const game = createGame(makeGravity, map, area)
 
-    console.log('Map: planets position:')
-    onMap.spawPlanets(3,600)
-
-    console.log('Map ready')
-
-    const game = createGame(makeGravity, onMap, area)
-
-    console.log('Game ready')
-
-    const render = renderScreen(document, area, game, onMap)
-
-    render.addUI('campAlt')
-    render.addUI('velX')
-    render.addUI('velY')
-    render.addUI('posX')
-    render.addUI('posY')
+    const render = renderScreen(document, ctx, game, map)
+    render.addUI(['campAlt', 'velX', 'velY', 'posX', 'posY'])
 
     function requestRender ()
     {
-      console.log("Render ready. Ok! Let's play!")
       render.start(game.fps, game.toDisplay)
-
     } requestRender()
-
-
-
-    //Diconnect ( Scoket IO )
-    //socket.on('max-connections-error', (message) =>{
-      //alert(message)
-      //ocket.disconnect()
-    //})
 
 	</script>
 </body>

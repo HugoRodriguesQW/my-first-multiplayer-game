@@ -1,9 +1,11 @@
 // Complete, insert render.update() in game.js
 
-export default function renderScreen(document, canvas, game, map) {
+// Document, why?
+// Ctx, why?
+// Game, why?
+// Map, why?
 
-  // TODO: Render a frame
-  const ctx = canvas.getContext('2d')
+export default function renderScreen(document, ctx, game, map) {
 
   // What is a UI ?
   class UI {
@@ -24,15 +26,29 @@ export default function renderScreen(document, canvas, game, map) {
 
   // Add and Remove UI
   function addUI(ID, value) {
-    Interface.push(new UI(ID, value))
+    if (Array.isArray(ID)) {
+
+      ID.forEach(function(id, i) {
+        Interface.push(new UI(
+          id, value == undefined ? null : value[i]
+        ))
+      })
+    }
+    else {
+      Interface.push(new UI(ID, value))
+    }
   }
 
   function removeUI(ID) {
-    Interface.forEach((UI, index) => {
-      if (UI.type === ID) {
-        Interface.splice(index, 1)
-      }
-    })
+    if (Array.isArray(ID)) {
+      ID.forEach((id) => {
+        Interface.forEach((UI, index) => {
+          if (UI.type === id) {
+            Interface.splice(index, 1)
+          }
+        })
+      })
+    }
   }
 
   const animation = {

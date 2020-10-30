@@ -1,7 +1,11 @@
+// makeGravity, why?
+// map, why?
+// Viewport, why?
+
 export default function createGame(makeGravity, map, viewport) {
 
   // FRAMES / SECONDS ( GAME SPEED )
-  const fps = 30
+  const fps = 60
 
   // CURRENT PLAYER CAMERA
   const cam = {
@@ -198,15 +202,18 @@ export default function createGame(makeGravity, map, viewport) {
 
   // Insert Engine Particles
   function engineParticles(ship) {
-    // Remove Particles if alpha < 0
-    particles.forEach((particle, index) => {
-      if (particle.apha < 0) {
-        particles.splice(index, 1)
-      }
-      else {
-        particle.update()
-      }
-    })
+
+    setTimeout(() => {
+      // Remove Particles if alpha < 0
+      particles.forEach((particle, index) => {
+        if (particle.apha < 0) {
+          particles.splice(index, 1)
+        }
+        else {
+          particle.update()
+        }
+      })
+    }, 0)
 
     // Main Engine
     if (ship.thrusting) {

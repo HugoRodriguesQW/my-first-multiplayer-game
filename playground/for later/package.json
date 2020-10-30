@@ -1,0 +1,25 @@
+{
+  "name": "my-first-multiplayer-game",
+  "version": "1.0.0",
+  "description": "Meu primeiro jogo multiplayer para estudar Node.js, Socket.io e Javascript.",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HugoRodriguesQW/my-first-multiplayer-game.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HugoRodriguesQW/my-first-multiplayer-game/issues"
+  },
+  "homepage": "https://github.com/HugoRodriguesQW/my-first-multiplayer-game#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.6",
+    "socket.io": "^2.3.0"
+  }
+}
