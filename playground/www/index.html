@@ -46,11 +46,11 @@
     const ctx = area.getContext('2d')
 
     const map = createMap()
-    map.spawPlanets(3,600)
+    map.spawPlanets(1,900)
 
     const game = createGame(makeGravity, map, area)
 
-    const render = renderScreen(document, ctx, game, map)
+    const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
     render.addUI(['campAlt', 'velX', 'velY', 'posX', 'posY'])
 
     function requestRender ()

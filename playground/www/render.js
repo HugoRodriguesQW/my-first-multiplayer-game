@@ -5,7 +5,7 @@
 // Game, why?
 // Map, why?
 
-export default function renderScreen(document, ctx, game, map) {
+export default function renderScreen(document, ctx, game, map, viewport) {
 
   // What is a UI ?
   class UI {
@@ -74,6 +74,8 @@ export default function renderScreen(document, ctx, game, map) {
     })
   }
 
+
+
   // Draw Space, Ships and Planets
   function update() {
 
@@ -110,6 +112,7 @@ export default function renderScreen(document, ctx, game, map) {
       ctx.stroke()
       ctx.fill()
     })
+
 
     game.particles.forEach((particle) => {
       ctx.save()
@@ -148,7 +151,59 @@ export default function renderScreen(document, ctx, game, map) {
       ctx.fillStyle = grd
       ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2, false)
       ctx.fill()
+
+      const dx = planet.x - game.playerShip.x;
+      const dy = planet.y - game.playerShip.y;
+
+      const algne = Math.atan2(dy, dx);
+
+      const fx = Math.cos(algne);
+      const fy = Math.sin(algne);
+
+      const posX = fx * 1;
+      const posY = fy * 1;
+
+      const padding = { x: viewport.x * 0.02, y: viewport.y * 0.02 }
+
+      let py
+      let px
+
+
+
+      if (posY < 0) {
+        if (posX > -0.9 && posY > -0.8 || posX < 0.9 && posY > -0.8) {
+          //Show on Top Bar
+          py = (game.playerShip.y - (viewport.y / 2) + padding.y)
+          px = game.playerShip.x + posX * (viewport.x / 2)
+        }
+        else {
+          py = game.playerShip.y + posY * (viewport.y / 2)
+          px = (game.playerShip.x - (viewport.x / 2) + padding.x)
+        }
+      }
+
+      if (posY > 0) {
+        if (posX > -0.9 && posY > -0.8 || posX < 0.9 && posY > -0.8) {
+          //Show on Bottom Bar
+          py = (game.playerShip.y + (viewport.y / 2) - padding.y)
+          px = game.playerShip.x + posX * (viewport.x / 2)
+        }
+        else {
+          //Show on lateral bar
+          py = game.playerShip.u + posY * (viewport.y / 2)
+          px = (game.playerShip.x + (viewport.x / 2) - padding.x)
+        }
+      }
+
+      console.log(posX, posY)
+      //console.log('top down: ', px, py)
+
+      ctx.beginPath()
+      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
+      ctx.arc(px, py, 4, 0, Math.PI * 2, false)
+      ctx.fill()
     })
+
   }
 
   return {

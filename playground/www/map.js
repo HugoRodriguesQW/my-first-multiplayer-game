@@ -3,8 +3,8 @@
 export default function createMap() {
 
   const mapSize = {
-    width: 10000,
-    height: 10000
+    width: 30000,
+    height: 30000
   }
 
 
@@ -31,12 +31,12 @@ export default function createMap() {
 
     for (planets.length; planets.length < quant;) {
       // Choose a radius
-      const radius = (Math.random() + 0.5) * maxSize
+      const radius = (Math.random() + 0.5) * (maxSize / 2)
       const padding = 4 * radius
 
       const spawArea = {
-        x: padding + (mapSize.width - (padding * 4)),
-        y: padding + (mapSize.height - (padding * 4))
+        x: padding + (mapSize.width - (padding * 2)),
+        y: padding + (mapSize.height - (padding * 2))
       }
 
       // Choose a position
@@ -79,7 +79,7 @@ export default function createMap() {
 
     planets.forEach((planet) => {
       const dist = Math.hypot(Math.sqrt((planet.x - pos.x) ** 2 + (planet.y - pos.y) ** 2))
-      if (dist < radius + planet.radius) {
+      if (dist < (radius * 2.5) + (planet.radius * 2.5)) {
         collision = true
       }
     })
