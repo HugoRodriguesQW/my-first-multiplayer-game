@@ -74,52 +74,62 @@ export default function renderScreen(document, ctx, game, map, viewport) {
 
   function PlanetsPointers(center, planet) {
 
-    const fromPos = center
-    const toPos = planet
 
-    const angle = Math.atan2(
-      toPos.y - fromPos.y, toPos.x - fromPos.x)
+    const dist = Math.sqrt((planet.x - center.x) ** 2 + (planet.y - center.y) ** 2);
+    if (dist < 10000) {
 
-    const corr = {
-      x: Math.cos(angle),
-      y: Math.sin(angle)
+      const fromPos = center
+      const toPos = planet
+
+      const angle = Math.atan2(
+        toPos.y - fromPos.y, toPos.x - fromPos.x)
+
+      const corr = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+      }
+      let point = {}
+
+      if (toPos.x <= center.x) {
+
+        point.x = center.x
+        point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+
+      }
+      if (toPos.x > center.x) {
+
+        point.x = center.x
+        point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+      }
+
+      if (toPos.y <= center.y) {
+
+        point.y = center.y
+        point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+
+      }
+      if (toPos.y > center.y) {
+
+        point.y = center.y
+        point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+      }
+
+
+      ctx.beginPath()
+      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
+      ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, false)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.fillStyle = 'white';
+      ctx.font = '9px Nunito';
+      ctx.textBaseline = 'middle'
+      ctx.fillText(dist.toFixed(0), point.x + 5.5, point.y + 1.2);
     }
-    let point = {}
-
-    if (toPos.x <= center.x) {
-
-      point.x = center.x
-      point.x = point.x + ((viewport.x / 2.2) * corr.x)
-
-
-    }
-    if (toPos.x > center.x) {
-
-      point.x = center.x
-      point.x = point.x + ((viewport.x / 2.2) * corr.x)
-
-    }
-
-    if (toPos.y <= center.y) {
-
-      point.y = center.y
-      point.y = point.y + ((viewport.y / 2.2) * corr.y)
-
-
-    }
-    if (toPos.y > center.y) {
-
-      point.y = center.y
-      point.y = point.y + ((viewport.y / 2.2) * corr.y)
-
-    }
-
-    //const dist = Math.sqrt((planet.x - center.x) ** 2 + (planet.y - center.y) ** 2);
-
-    ctx.beginPath()
-    ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
-    ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, false)
-    ctx.fill()
   }
 
   const bgStars = []
