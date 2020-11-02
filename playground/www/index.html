@@ -46,7 +46,9 @@
     const ctx = area.getContext('2d')
 
     const map = createMap()
+    map.GenerateName(10)
     map.spawPlanets(10,900)
+
 
     const game = createGame(makeGravity, map, area)
 
