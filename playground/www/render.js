@@ -74,6 +74,56 @@ export default function renderScreen(document, ctx, game, map, viewport) {
     })
   }
 
+  function PlanetsPointers(center, planet) {
+
+    const padd = 10
+
+    const fromPos = center
+    const toPos = planet
+
+    const angle = Math.atan2(
+      toPos.y - fromPos.y, toPos.x - fromPos.x)
+
+    const corr = {
+      x: Math.cos(angle),
+      y: Math.sin(angle)
+    }
+    let point = {}
+
+    if (toPos.x <= center.x) {
+
+      point.x = center.x
+      point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+
+    }
+    if (toPos.x > center.x) {
+
+      point.x = center.x
+      point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+    }
+
+    if (toPos.y <= center.y) {
+
+      point.y = center.y
+      point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+
+    }
+    if (toPos.y > center.y) {
+
+      point.y = center.y
+      point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+    }
+
+    ctx.beginPath()
+    ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
+    ctx.arc(point.x, point.y, 2, 0, Math.PI * 2, false)
+    ctx.fill()
+  }
+
 
 
   // Draw Space, Ships and Planets
@@ -152,56 +202,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2, false)
       ctx.fill()
 
-      const dx = planet.x - game.playerShip.x;
-      const dy = planet.y - game.playerShip.y;
-
-      const algne = Math.atan2(dy, dx);
-
-      const fx = Math.cos(algne);
-      const fy = Math.sin(algne);
-
-      const posX = fx * 1;
-      const posY = fy * 1;
-
-      const padding = { x: viewport.x * 0.02, y: viewport.y * 0.02 }
-
-      let py
-      let px
-
-
-
-      if (posY < 0) {
-        if (posX > -0.9 && posY > -0.8 || posX < 0.9 && posY > -0.8) {
-          //Show on Top Bar
-          py = (game.playerShip.y - (viewport.y / 2) + padding.y)
-          px = game.playerShip.x + posX * (viewport.x / 2)
-        }
-        else {
-          py = game.playerShip.y + posY * (viewport.y / 2)
-          px = (game.playerShip.x - (viewport.x / 2) + padding.x)
-        }
-      }
-
-      if (posY > 0) {
-        if (posX > -0.9 && posY > -0.8 || posX < 0.9 && posY > -0.8) {
-          //Show on Bottom Bar
-          py = (game.playerShip.y + (viewport.y / 2) - padding.y)
-          px = game.playerShip.x + posX * (viewport.x / 2)
-        }
-        else {
-          //Show on lateral bar
-          py = game.playerShip.u + posY * (viewport.y / 2)
-          px = (game.playerShip.x + (viewport.x / 2) - padding.x)
-        }
-      }
-
-      console.log(posX, posY)
-      //console.log('top down: ', px, py)
-
-      ctx.beginPath()
-      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
-      ctx.arc(px, py, 4, 0, Math.PI * 2, false)
-      ctx.fill()
+      PlanetsPointers(game.playerShip, planet)
     })
 
   }
