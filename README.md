@@ -45,4 +45,7 @@ Assim que conseguir isso criarei o jogo. Basta implementá-lo depois.
 
 **!** Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)
 
-**!** Jogo *local* funcinando (jogo incompleto): [YouTube](https://youtu.be/JfPxMruIC-w)
+**!** Asteroids (incompleto): [YouTube](https://youtu.be/kRI2PYlw68M)
+
+**!** Asteroids com updates (incompleto): [YouTube](https://youtu.be/56PjJ7q4DtA)
+
