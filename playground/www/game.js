@@ -11,8 +11,8 @@ export default function createGame(makeGravity, map, viewport) {
   const cam = {
     x: 0,
     y: 0,
-    width: viewport.width,
-    height: viewport.height,
+    width: 500,
+    height: 500,
     follow: function(target) {
       this.x = target.x - (viewport.width / 2)
       this.y = target.y - (viewport.height / 2)
@@ -66,10 +66,6 @@ export default function createGame(makeGravity, map, viewport) {
         this.thrust.x = this.thrust.x + this.thrustSpeed * Math.cos(this.radian) / fps
         this.thrust.y = this.thrust.y - this.thrustSpeed * Math.sin(this.radian) / fps
       }
-      else if (!this.decrease) {
-        //this.thrust.x -= this.friction * this.thrust.x / fps Disabled.
-        //this.thrust.y -= this.friction * this.thrust.y / fps Gravity doesn't work with that
-      }
       else if (this.decrease) {
         this.thrust.x = this.thrust.x - this.thrustSpeed * Math.cos(this.radian) / (fps * 2)
         this.thrust.y = this.thrust.y + this.thrustSpeed * Math.sin(this.radian) / (fps * 2)
@@ -102,8 +98,8 @@ export default function createGame(makeGravity, map, viewport) {
 
   // GAME OBJECTS CREATE
   const playerShip = new ship({
-    x: viewport.width / 2,
-    y: viewport.height / 2
+    x: 15000,
+    y: 15000
   }, 20, 90, 360, 2, 0.1)
 
   const spaceShips = []
