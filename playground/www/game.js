@@ -20,13 +20,6 @@ export default function createGame(makeGravity, map, viewport) {
   }
 
   // GAME PREFABS
-  class display {
-    constructor(type, value) {
-      this.type = type
-      this.value = value
-    }
-  }
-
   class ship {
     constructor(position, size, rotation, turnSpeed, thrustSpeed, friction) {
       this.x = position.x
@@ -105,7 +98,6 @@ export default function createGame(makeGravity, map, viewport) {
   const spaceShips = []
   const particles = []
   const planets = []
-  const toDisplay = []
 
   // GAME OBJECTS PUSH
   spaceShips.push(playerShip)
@@ -113,24 +105,43 @@ export default function createGame(makeGravity, map, viewport) {
     planets.push(planet)
   })
 
-  toDisplay.push(new display('campAlt'))
-  toDisplay.push(new display('velX'))
-  toDisplay.push(new display('velY'))
-  toDisplay.push(new display('posX'))
-  toDisplay.push(new display('posY'))
+  // Data Game (export)
+
+  class data {
+    constructor(id, value, target) {
+      this.id = id
+      this.value = value
+      this.target = target === undefined ? { x: 0, y: 0 } : target
+    }
+  }
+
+  const exportData = [
+    new data('campAlt'),
+    new data('velX'),
+    new data('velY'),
+    new data('posX'),
+    new data('posY')
+  ]
+
+  function renewData(id, newVal) {
+    exportData.forEach((data) => {
+      if (data.id === id) {
+        data.value = newVal
+      }
+    })
+  }
 
   setInterval(update, 1000 / fps)
 
 
   // UPDATE GAME
-
   function update() {
 
     // Display Update
-    updateDisplay('velX', (playerShip.thrust.x + playerShip.velocity.x).toFixed(1))
-    updateDisplay('velY', (playerShip.thrust.y + playerShip.velocity.y).toFixed(1))
-    updateDisplay('posX', (playerShip.x).toFixed(0))
-    updateDisplay('posY', (playerShip.y).toFixed(0))
+    renewData('velX', (playerShip.thrust.x + playerShip.velocity.x).toFixed(1))
+    renewData('velY', (playerShip.thrust.y + playerShip.velocity.y).toFixed(1))
+    renewData('posX', (playerShip.x).toFixed(0))
+    renewData('posY', (playerShip.y).toFixed(0))
 
     // SHIPS UPDATE
     moveShip(playerShip)
@@ -148,10 +159,10 @@ export default function createGame(makeGravity, map, viewport) {
       if (dist - planet.radius < planet.orbitRange) {
         playerShip.Orbiting.push(planet);
         playerShip.alt = 'Altitude: ' + (dist - planet.radius).toFixed(1) + ' Km'
-        updateDisplay('campAlt', 'Altitude: ' + (dist - planet.radius).toFixed(1) + ' Km')
+        renewData('campAlt', 'Altitude: ' + (dist - planet.radius).toFixed(1) + ' Km')
       }
       else if (playerShip.Orbiting.length == 0) {
-        updateDisplay('campAlt', ' ')
+        renewData('campAlt', ' ')
       }
 
     })
@@ -170,14 +181,6 @@ export default function createGame(makeGravity, map, viewport) {
           makeGravity(playerShip, planet)
         }
       })
-    })
-  }
-
-  function updateDisplay(type, value) {
-    toDisplay.forEach((ds) => {
-      if (ds.type === type) {
-        ds.value = value
-      }
     })
   }
 
@@ -323,7 +326,7 @@ export default function createGame(makeGravity, map, viewport) {
     spaceShips,
     planets,
     particles,
-    toDisplay
+    exportData
   }
 
 }

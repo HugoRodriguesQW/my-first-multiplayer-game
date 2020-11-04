@@ -22,7 +22,7 @@
 
 	<canvas id="game-area"></canvas>
 
-  <div id="speed">
+  <!--<div id="speed"> //Obsolete Interface
     <p>Velocidade:</p>
     <p class="color-red">X: <span id="velX"></span></p>
     <p class="color-green">Y: <span id="velY"></span></p>
@@ -31,7 +31,7 @@
     </div>
     <p class="little">< X <span id="posX"></span> ></p>
     <p class="little">< Y <span id="posY"></span> ></p>
-  </div>
+  </div>-->
 
 	<script type="module">
 	  import createGame from './game.js'
@@ -53,11 +53,15 @@
     const game = createGame(makeGravity, map, area)
 
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
-    render.addUI(['campAlt', 'velX', 'velY', 'posX', 'posY'])
+    render.addUI('velX', 'top-left-1')
+    render.addUI('velY', 'top-left-2')
+    render.addUI('campAlt', 'top-left-3')
+    render.addUI('posX', 'middle-left')
+    render.addUI('posY', 'bottom-center')
 
     function requestRender ()
     {
-      render.start(game.fps, game.toDisplay)
+      render.start(game.fps)
     } requestRender()
 
 	</script>
