@@ -111,7 +111,6 @@ export default function createGame(makeGravity, map, viewport) {
     constructor(id, value, target) {
       this.id = id
       this.value = value
-      this.target = target === undefined ? { x: 0, y: 0 } : target
     }
   }
 

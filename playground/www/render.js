@@ -1,67 +1,63 @@
-// Complete, insert render.update() in game.js
-
-// Document, why?
-// Ctx, why?
-// Game, why?
-// Map, why?
-
 export default function renderScreen(document, ctx, game, map, viewport) {
-
+	
+  const Interface = []
+  
+  let zeroScreenPosition = {x:0, y: 0}
+  const screenPositions = {
+    'top-left-1': 	 zeroScreenPosition,
+    'top-left-2':	 zeroScreenPosition,
+    'top-left-3': 	 zeroScreenPosition,
+    'middle-left':   zeroScreenPosition,
+    'bottom-center': zeroScreenPosition
+  }
+  
+  const defaultUiConfig = {
+  	value : 'empty',
+  	style : {
+  		fillStyle: 'white',
+  		font: '9px Nunito',
+  		textBaseline: 'middle'
+  	},
+  	position : {
+ 	 x: zeroScreenPosition.x,
+ 	 y: zeroScreenPosition.y
+  	}
+  }
+  
   class UI {
     constructor(id, position, value, style) {
-      this.defaultStyle = {
-        fillStyle: 'white',
-        font: '9px Nunito',
-        textBaseline: 'middle'
-      }
-      this.defaultPosition = {
-        x: game.playerShip.x,
-        y: game.playerShip.y
-      }
-      this.defaultValue = 'empty'
-
       this.id = id
-      this.position = position === undefined ? this.defaultPosition : position
-      this.value = value === undefined ? this.defaultValue : value
-      this.stl = style === undefined ? this.defaultStyle : style
+      this.position = position === undefined ? defaultUiConfig.position : position
+      this.value = value === undefined ? defaultUiConfig.value  : value
+      this.stl = style === undefined ? defaultUiConfig.style  : style
     }
   }
 
-  const Interface = []
-
-  const InitialPos = { x: game.playerShip.x, y: game.playerShip.y }
-  const InterfacePos = {
-    'top-left-1': InitialPos,
-    'top-left-2': InitialPos,
-    'top-left-3': InitialPos,
-    'middle-left': InitialPos,
-    'bottom-center': InitialPos
+  function addUI(values) {
+  	values.forEach((value) => {
+    Interface.push(new UI(value.id, screenPositions[value.pos], value.val))
+  	})
   }
 
-
-  function addUI(id, pos, val) {
-    Interface.push(new UI(id, InterfacePos[pos], val))
-  }
-
-  function removeUI(ID) {
+  function removeUI(IDs) {
     Interface.forEach((ui, num) => {
-      if (ui.id === ID) {
-        Interface.splice(num, 1)
-      }
+      IDs.forEach((receivedId) => {
+      	if (ui.id === receivedId) {
+      	Interface.splice(num, 1)
+      	}
+      })
     })
   }
 
   const animation = {
-    interval: undefined
-  }
-
-  function start(fps) {
-    animation.interval = setInterval(update, 1000 / fps)
-  }
-
-  function stop() {
-    clearInterval(animation.interval)
-  }
+    interval: undefined,
+    start: function (fps) {
+    	animation.interval = setInterval(update, 1000 / fps)
+  	},
+  	stop: function () {
+    	clearInterval(animation.interval)
+  	}
+  }  
 
   const bgStars = []
   const maxStarts = 100
@@ -74,7 +70,13 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       this.color = color
     }
   }
-
+	
+  function updateScreenPosition (zeroPoint)
+  {
+  	zeroScreenPosition.x = game.playerShip.x 
+  	zeroScreenPosition.y = game.playerShip.y
+  }
+  
   function updateUI(datas) {
     Interface.forEach((ui) => {
       datas.forEach((data) => {
@@ -87,7 +89,8 @@ export default function renderScreen(document, ctx, game, map, viewport) {
 
   // Draw Space, Ships and Planets
   function update() {
-
+  	
+	updateScreenPosition()
     updateUI(game.exportData)
 
     // Background
@@ -272,8 +275,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
   }
 
   return {
-    start,
-    stop,
+   	animation,
     addUI,
     removeUI,
     Interface
