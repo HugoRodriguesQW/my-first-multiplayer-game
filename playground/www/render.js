@@ -3,12 +3,13 @@ export default function renderScreen(document, ctx, game, map, viewport) {
   const Interface = []
   
   let zeroScreenPosition = {x:0, y: 0}
+  
   const screenPositions = {
-    'top-left-1': 	 zeroScreenPosition,
-    'top-left-2':	 zeroScreenPosition,
-    'top-left-3': 	 zeroScreenPosition,
-    'middle-left':   zeroScreenPosition,
-    'bottom-center': zeroScreenPosition
+    'top-left-1': 	 {x: 10, y:30},
+    'top-left-2':	 {x: 10, y:40},
+    'top-left-3': 	 {x: 10, y:50},
+    'middle-left':   {x: 10, y: viewport.y/2},
+    'bottom-center': {x: viewport.x/2 , y: viewport.y - 10}
   }
   
   const defaultUiConfig = {
@@ -18,24 +19,25 @@ export default function renderScreen(document, ctx, game, map, viewport) {
   		font: '9px Nunito',
   		textBaseline: 'middle'
   	},
-  	position : {
- 	 x: zeroScreenPosition.x,
- 	 y: zeroScreenPosition.y
-  	}
+  	position :  zeroScreenPosition
   }
   
   class UI {
-    constructor(id, position, value, style) {
+    constructor(id, position,  value, style) {
       this.id = id
-      this.position = position === undefined ? defaultUiConfig.position : position
       this.value = value === undefined ? defaultUiConfig.value  : value
       this.stl = style === undefined ? defaultUiConfig.style  : style
+      
+      this.positionKey = position
+      this.position = position === undefined ? 
+      defaultUiConfig.position : 	
+      screenPositions[position]
     }
   }
 
   function addUI(values) {
   	values.forEach((value) => {
-    Interface.push(new UI(value.id, screenPositions[value.pos], value.val))
+    Interface.push(new UI(value.id, value.pos, value.val))
   	})
   }
 
@@ -70,14 +72,23 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       this.color = color
     }
   }
-	
-  function updateScreenPosition (zeroPoint)
+
+  function updateScreenPositions (zeroPoint)
   {
-  	zeroScreenPosition.x = game.playerShip.x 
-  	zeroScreenPosition.y = game.playerShip.y
+  	zeroScreenPosition.x = game.playerShip.x - viewport.x/2
+  	zeroScreenPosition.y = game.playerShip.y - viewport.y/2
+  	
+  	Interface.forEach((ui) => {
+  		const thisPos = screenPositions[ui.positionKey]
+  		ui.position = {
+  		x: zeroScreenPosition.x + thisPos.x, 
+  		y: zeroScreenPosition.y + thisPos.y
+		}
+  	})
   }
   
   function updateUI(datas) {
+  	updateScreenPositions()
     Interface.forEach((ui) => {
       datas.forEach((data) => {
         if (ui.type === data.id) {
@@ -89,8 +100,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
 
   // Draw Space, Ships and Planets
   function update() {
-  	
-	updateScreenPosition()
+
     updateUI(game.exportData)
 
     // Background
