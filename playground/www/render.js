@@ -1,136 +1,65 @@
-// Complete, insert render.update() in game.js
-
-// Document, why?
-// Ctx, why?
-// Game, why?
-// Map, why?
-
 export default function renderScreen(document, ctx, game, map, viewport) {
-
-  class UI {
-    constructor(type, value) {
-      this.type = type
-      this.value = value
-      this.target = document.getElementById(type)
-    }
-
-    update(newValue) {
-      this.value = newValue
-      this.target.innerHTML = this.value
-    }
-  }
-
+	
   const Interface = []
-  const toDisplay = { ds: [null] }
-
-  function addUI(ID, value) {
-    if (Array.isArray(ID)) {
-
-      ID.forEach(function(id, i) {
-        Interface.push(new UI(
-          id, value == undefined ? null : value[i]
-        ))
-      })
+  
+  let zeroScreenPosition = {x:0, y: 0}
+  
+  const screenPositions = {
+    'top-left-1': 	 {x: 10, y:30},
+    'top-left-2':	 {x: 10, y:40},
+    'top-left-3': 	 {x: 10, y:50},
+    'middle-left':   {x: 10, y: viewport.y/2},
+    'bottom-center': {x: viewport.x/2 , y: viewport.y - 10}
+  }
+  
+  const defaultUiConfig = {
+  	value : 'empty',
+  	style : {
+  		fillStyle: 'white',
+  		font: '9px Nunito',
+  		textBaseline: 'middle'
+  	},
+  	position :  zeroScreenPosition
+  }
+  
+  class UI {
+    constructor(id, position,  value, style) {
+      this.id = id
+      this.value = value === undefined ? defaultUiConfig.value  : value
+      this.stl = style === undefined ? defaultUiConfig.style  : style
+      
+      this.positionKey = position
+      this.position = position === undefined ? 
+      defaultUiConfig.position : 	
+      screenPositions[position]
     }
-    else {
-      Interface.push(new UI(ID, value))
-    }
   }
 
-  function removeUI(ID) {
-    if (Array.isArray(ID)) {
-      ID.forEach((id) => {
-        Interface.forEach((UI, index) => {
-          if (UI.type === id) {
-            Interface.splice(index, 1)
-          }
-        })
-      })
-    }
+  function addUI(values) {
+  	values.forEach((value) => {
+    Interface.push(new UI(value.id, value.pos, value.val))
+  	})
   }
 
-  const animation = {
-    interval: undefined
-  }
-
-  function start(fps, display) {
-    toDisplay.ds = display
-    animation.interval = setInterval(update, 1000 / fps)
-  }
-
-  function stop() {
-    clearInterval(animation.interval)
-  }
-
-  function updateUI(fromGame) {
-    Interface.forEach((ui) => {
-      fromGame.forEach((ds) => {
-        if (ui.type === ds.type) {
-          ui.update(ds.value)
-        }
+  function removeUI(IDs) {
+    Interface.forEach((ui, num) => {
+      IDs.forEach((receivedId) => {
+      	if (ui.id === receivedId) {
+      	Interface.splice(num, 1)
+      	}
       })
     })
   }
 
-  function PlanetsPointers(center, planet) {
-
-
-    const dist = Math.sqrt((planet.x - center.x) ** 2 + (planet.y - center.y) ** 2);
-    if (dist < 10000) {
-
-      const fromPos = center
-      const toPos = planet
-
-      const angle = Math.atan2(
-        toPos.y - fromPos.y, toPos.x - fromPos.x)
-
-      const corr = {
-        x: Math.cos(angle),
-        y: Math.sin(angle)
-      }
-      let point = {}
-
-      if (toPos.x <= center.x) {
-
-        point.x = center.x
-        point.x = point.x + ((viewport.x / 2.2) * corr.x)
-
-
-      }
-      if (toPos.x > center.x) {
-
-        point.x = center.x
-        point.x = point.x + ((viewport.x / 2.2) * corr.x)
-
-      }
-
-      if (toPos.y <= center.y) {
-
-        point.y = center.y
-        point.y = point.y + ((viewport.y / 2.2) * corr.y)
-
-
-      }
-      if (toPos.y > center.y) {
-
-        point.y = center.y
-        point.y = point.y + ((viewport.y / 2.2) * corr.y)
-
-      }
-
-
-      ctx.beginPath()
-      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
-      ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, false)
-      ctx.fill()
-
-      ctx.beginPath()
-      ctx.fillStyle = 'white';
-      ctx.font = '9px Nunito';
-      ctx.textBaseline = 'middle'
-      ctx.fillText(dist.toFixed(0), point.x + 5.5, point.y + 1.2);
-    }
-  }
+  const animation = {
+    interval: undefined,
+    start: function (fps) {
+    	animation.interval = setInterval(update, 1000 / fps)
+  	},
+  	stop: function () {
+    	clearInterval(animation.interval)
+  	}
+  }  
 
   const bgStars = []
   const maxStarts = 100
@@ -144,18 +73,44 @@ export default function renderScreen(document, ctx, game, map, viewport) {
     }
   }
 
+  function updateScreenPositions (zeroPoint)
+  {
+  	zeroScreenPosition.x = game.playerShip.x - viewport.x/2
+  	zeroScreenPosition.y = game.playerShip.y - viewport.y/2
+  	
+  	Interface.forEach((ui) => {
+  		const thisPos = screenPositions[ui.positionKey]
+  		ui.position = {
+  		x: zeroScreenPosition.x + thisPos.x, 
+  		y: zeroScreenPosition.y + thisPos.y
+		}
+  	})
+  }
+  
+  function updateUI(datas) {
+  	updateScreenPositions()
+    Interface.forEach((ui) => {
+      datas.forEach((data) => {
+        if (ui.type === data.id) {
+          ui.value = data.value
+        }
+      })
+    })
+  }
+
   // Draw Space, Ships and Planets
   function update() {
 
-    updateUI(toDisplay.ds)
+    updateUI(game.exportData)
 
+    // Background
     ctx.beginPath()
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
     ctx.fillRect(0, 0, map.mapSize.width, map.mapSize.height)
     ctx.setTransform(1, 0, 0, 1, -game.cam.x, -game.cam.y)
+    // Background
 
-    //draw starts
-
+    // Background (Stars)
     const padding = 1.9
     const limits = {
       minX: game.playerShip.x - (viewport.x / padding),
@@ -164,7 +119,6 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       maxY: game.playerShip.y + (viewport.y / padding)
     }
 
-    // Spawn new Stars
     for (let i = bgStars.length; i < (maxStarts * Math.random()); i++) {
       let color = 'white'
       if (Math.random() < 0.1) {
@@ -177,21 +131,31 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       ))
     }
 
-    //Remove distant stars
     bgStars.forEach((star, num) => {
       if (star.x < limits.minX || star.x > limits.maxX || star.y < limits.minY || star.y > limits.maxY) {
         bgStars.splice(num, 1)
       }
     })
 
-    //Render Starts
     bgStars.forEach((star) => {
       ctx.beginPath()
       ctx.fillStyle = star.color
       ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2, false)
       ctx.fill()
     })
+    // Background (Stars)
 
+    // Interface Render
+    Interface.forEach((ui) => {
+      ctx.beginPath()
+      ctx.fillStyle = 'white'
+      ctx.font = '12px Nunito'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(ui.value, ui.position.x, ui.position.y)
+    })
+    // Interface
+
+    // Game
     game.spaceShips.forEach((ship) => {
       ctx.beginPath()
       ctx.lineWidth = ship.size / 20
@@ -256,12 +220,72 @@ export default function renderScreen(document, ctx, game, map, viewport) {
 
       PlanetsPointers(game.playerShip, planet)
     })
+    // Game
 
   }
 
+  function PlanetsPointers(center, planet) {
+
+
+    const dist = Math.sqrt((planet.x - center.x) ** 2 + (planet.y - center.y) ** 2);
+    if (dist < 10000) {
+
+      const fromPos = center
+      const toPos = planet
+
+      const angle = Math.atan2(
+        toPos.y - fromPos.y, toPos.x - fromPos.x)
+
+      const corr = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+      }
+      let point = {}
+
+      if (toPos.x <= center.x) {
+
+        point.x = center.x
+        point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+
+      }
+      if (toPos.x > center.x) {
+
+        point.x = center.x
+        point.x = point.x + ((viewport.x / 2.2) * corr.x)
+
+      }
+
+      if (toPos.y <= center.y) {
+
+        point.y = center.y
+        point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+
+      }
+      if (toPos.y > center.y) {
+
+        point.y = center.y
+        point.y = point.y + ((viewport.y / 2.2) * corr.y)
+
+      }
+
+
+      ctx.beginPath()
+      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
+      ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, false)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.fillStyle = 'white';
+      ctx.font = '9px Nunito';
+      ctx.textBaseline = 'middle'
+      ctx.fillText(dist.toFixed(0), point.x + 5.5, point.y + 1.2);
+    }
+  }
+
   return {
-    start,
-    stop,
+   	animation,
     addUI,
     removeUI,
     Interface

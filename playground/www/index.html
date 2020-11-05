@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href='./css/game.css' />
 
 	<script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>-->
 
 </head>
 
@@ -22,19 +22,8 @@
 
 	<canvas id="game-area"></canvas>
 
-  <div id="speed">
-    <p>Velocidade:</p>
-    <p class="color-red">X: <span id="velX"></span></p>
-    <p class="color-green">Y: <span id="velY"></span></p>
-    <div id="GravCampAlert">
-      <p id="campAlt"></p>
-    </div>
-    <p class="little">< X <span id="posX"></span> ></p>
-    <p class="little">< Y <span id="posY"></span> ></p>
-  </div>
-
 	<script type="module">
-	  import createGame from './game.js'
+	import createGame from './game.js'
     import createMap from './map.js'
     import makeGravity from './gravity.js'
     import renderScreen from './render.js'
@@ -53,11 +42,17 @@
     const game = createGame(makeGravity, map, area)
 
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
-    render.addUI(['campAlt', 'velX', 'velY', 'posX', 'posY'])
+    render.addUI([
+    {id: 'velX', 	pos: 'top-left-1'},
+    {id: 'velY', 	pos: 'top-left-2'},
+    {id: 'campAlt', pos: 'top-left-3'},
+    {id: 'posX', 	pos: 'middle-left'},
+    {id: 'posY', 	pos: 'bottom-center'}
+    ])
 
     function requestRender ()
     {
-      render.start(game.fps, game.toDisplay)
+      render.animation.start(game.fps)
     } requestRender()
 
 	</script>
