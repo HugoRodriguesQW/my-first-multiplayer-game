@@ -149,7 +149,6 @@ export default function renderScreen(document, context, game, map, viewport) {
       }
       ctx.fillText(ui.value, ui.position.x, ui.position.y)
     })
-    context.clearRect(0, 0, viewport.x, viewport.y)
     context.drawImage(back_canvas, 0, 0)
   }
 
@@ -312,7 +311,14 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   function DrawBackground() {
     ctx.beginPath()
-    ctx.clearRect(0, 0, map.mapSize.width, map.mapSize.height)
+    context.clearRect(0, 0, viewport.x, viewport.y)
+
+    ctx.clearRect(
+      game.playerShip.x - viewport.x / 2,
+      game.playerShip.y - viewport.y / 2,
+      viewport.x, viewport.y
+    )
+
     ctx.setTransform(1, 0, 0, 1, -game.cam.x, -game.cam.y)
   }
 
