@@ -43,9 +43,11 @@ Gitpod: [gitpod.io/#](gitpod.io/#https://github.com/HugoRodriguesQW/my-first-mul
 **!** O jogo ainda não existe. Começarei fazendo uma comunicação entre server e client em tempo real.
 Assim que conseguir isso criarei o jogo. Basta implementá-lo depois.
 
-**!** Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)
+**! Interface Flexível: [YouTube](https://youtu.be/QinxgfMqpG0)**
 
-**!** Asteroids (incompleto): [YouTube](https://youtu.be/kRI2PYlw68M)
+*! Asteroids (incompleto): [YouTube](https://youtu.be/kRI2PYlw68M)*
 
-**!** Asteroids com updates (incompleto): [YouTube](https://youtu.be/56PjJ7q4DtA)
+*! Asteroids com updates (incompleto): [YouTube](https://youtu.be/56PjJ7q4DtA)*
+
+*! Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)*
 
