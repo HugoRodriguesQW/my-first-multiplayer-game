@@ -43,8 +43,8 @@
 
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
     render.addUI([
-    {id: 'velX', 	pos: 'top-left-1'},
-    {id: 'velY', 	pos: 'top-left-2'},
+    {id: 'velX', 	pos: 'top-left-1', style: {fillStyle: 'red',}},
+    {id: 'velY', 	pos: 'top-left-2', style: {fillStyle: 'green'}},
     {id: 'campAlt', pos: 'top-left-3'},
     {id: 'posX', 	pos: 'middle-left'},
     {id: 'posY', 	pos: 'bottom-center'}

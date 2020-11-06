@@ -1,5 +1,3 @@
-//Complete
-
 export default function makeGravity(corp, planet) {
 
 

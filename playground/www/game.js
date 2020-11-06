@@ -1,7 +1,3 @@
-// makeGravity, why?
-// map, why?
-// Viewport, why?
-
 export default function createGame(makeGravity, map, viewport) {
 
   // FRAMES / SECONDS ( GAME SPEED )
@@ -137,10 +133,10 @@ export default function createGame(makeGravity, map, viewport) {
   function update() {
 
     // Display Update
-    renewData('velX', (playerShip.thrust.x + playerShip.velocity.x).toFixed(1))
-    renewData('velY', (playerShip.thrust.y + playerShip.velocity.y).toFixed(1))
-    renewData('posX', (playerShip.x).toFixed(0))
-    renewData('posY', (playerShip.y).toFixed(0))
+    renewData('velX', `X: ${(playerShip.thrust.x + playerShip.velocity.x).toFixed(1)} Km/s`)
+    renewData('velY', `Y: ${(playerShip.thrust.y + playerShip.velocity.y).toFixed(1)} Km/s`)
+    renewData('posX', `< ${(playerShip.x).toFixed(0)} X >`)
+    renewData('posY', `< ${(playerShip.y).toFixed(0)} Y >`)
 
     // SHIPS UPDATE
     moveShip(playerShip)

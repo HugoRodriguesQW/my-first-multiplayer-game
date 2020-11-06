@@ -26,7 +26,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
     constructor(id, position,  value, style) {
       this.id = id
       this.value = value === undefined ? defaultUiConfig.value  : value
-      this.stl = style === undefined ? defaultUiConfig.style  : style
+      this.stl = CheckAndFixMissingKeys(style, defaultUiConfig.style)
       
       this.positionKey = position
       this.position = position === undefined ? 
@@ -37,7 +37,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
 
   function addUI(values) {
   	values.forEach((value) => {
-    Interface.push(new UI(value.id, value.pos, value.val))
+    Interface.push(new UI(value.id, value.pos, value.val, value.style))
   	})
   }
 
@@ -50,16 +50,21 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       })
     })
   }
-
-  const animation = {
-    interval: undefined,
-    start: function (fps) {
-    	animation.interval = setInterval(update, 1000 / fps)
-  	},
-  	stop: function () {
-    	clearInterval(animation.interval)
-  	}
-  }  
+  
+  function CheckAndFixMissingKeys (from, defaultKeys)
+  {	
+    from = from === undefined? {} : from
+  	const finalObject = from
+  	
+   	for(const key in defaultKeys)
+   	{
+   	  if(from[key] === undefined)
+   	  {
+   	  	finalObject[key] = defaultKeys[key]
+	  }
+   	}
+   	return finalObject
+  }
 
   const bgStars = []
   const maxStarts = 100
@@ -89,15 +94,26 @@ export default function renderScreen(document, ctx, game, map, viewport) {
   
   function updateUI(datas) {
   	updateScreenPositions()
+  	
     Interface.forEach((ui) => {
       datas.forEach((data) => {
-        if (ui.type === data.id) {
+        if (ui.id === data.id) {
           ui.value = data.value
         }
       })
     })
   }
-
+  
+  const animation = {
+    interval: undefined,
+    start: function (fps) {
+    	animation.interval = setInterval(update, 1000 / fps)
+  	},
+  	stop: function () {
+    	clearInterval(animation.interval)
+  	}
+  }  
+  
   // Draw Space, Ships and Planets
   function update() {
 
@@ -148,9 +164,10 @@ export default function renderScreen(document, ctx, game, map, viewport) {
     // Interface Render
     Interface.forEach((ui) => {
       ctx.beginPath()
-      ctx.fillStyle = 'white'
-      ctx.font = '12px Nunito'
-      ctx.textBaseline = 'middle'
+      for(const key in ui.stl)
+      {
+      	ctx[key] = ui.stl[key]
+      }
       ctx.fillText(ui.value, ui.position.x, ui.position.y)
     })
     // Interface
@@ -280,7 +297,7 @@ export default function renderScreen(document, ctx, game, map, viewport) {
       ctx.fillStyle = 'white';
       ctx.font = '9px Nunito';
       ctx.textBaseline = 'middle'
-      ctx.fillText(dist.toFixed(0), point.x + 5.5, point.y + 1.2);
+      ctx.fillText((dist - planet.radius).toFixed(0), point.x + 5.5, point.y + 1.2);
     }
   }
 
