@@ -21,13 +21,14 @@
 <body>
 
 	<canvas id="game-area"></canvas>
+	<canvas id="ui-area"></canvas>
 
 	<script type="module">
 	import createGame from './game.js'
     import createMap from './map.js'
     import makeGravity from './gravity.js'
     import renderScreen from './render.js'
-    
+
 
     // HTML
     const area = document.getElementById('game-area')
@@ -36,7 +37,6 @@
     const ctx = area.getContext('2d')
 
     const map = createMap()
-    map.GenerateName(10)
     map.spawPlanets(10,900)
 
 
