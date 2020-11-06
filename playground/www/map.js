@@ -85,8 +85,8 @@ export default function createMap() {
     return collision
   }
 
-  const prefixes = ['Moon of', 'Earth', 'Yela', 'Delamar', 'Old', 'Hurrance', 'Arch', 'York', 'Jhune', 'Babbage', 'Boos', 'Horizon', 'New', 'Fars']
-  const sufixes = [' Lands', ' Pars', ' Aesis', ' Carachi', ' Fark', ' Lorville', ' Lagos', ' Deli', ' Dhaka', ' Anvil', ' Mirage', ' Dongguan']
+  const prefixes = ['Moon of', 'Earth', 'Yela', 'Delamar', 'Old', 'Hurrance', 'Arch', 'York', 'Jhune', 'The', 'Boos', 'Horizon', 'New', 'Fars']
+  const sufixes = [' Babbage', ' Pars', ' Aesis', ' Carachi', ' Fark', ' Lorville', ' Lagos', ' Deli', ' Dhaka', ' Anvil', ' Mirage', ' Dongguan']
 
   const names = []
 
