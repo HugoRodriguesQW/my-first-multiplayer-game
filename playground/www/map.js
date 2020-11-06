@@ -24,9 +24,13 @@ export default function createMap() {
   }
 
   const planets = []
+  const names = []
 
   function spawPlanets(quant, maxSize) {
-    console.log('MAP: planets spawner required...')
+
+    if (names.length < quant) {
+      GenerateName(quant)
+    }
 
     for (let i = planets.length; planets.length < quant; i++) {
       // Choose a radius
@@ -39,11 +43,6 @@ export default function createMap() {
       }
 
       // Choose a position
-      const randomize = {
-        x: Math.random(),
-        y: Math.random(),
-      }
-
       let pos = { x: 0, y: 0 }
 
       const position = {
@@ -53,11 +52,8 @@ export default function createMap() {
 
       if (!planetsCollision(position, radius)) {
         pos = position
-        console.log('MAP: Planet spawned at:')
-        console.log('MAP (' + names[i] + '): ', 'x: ' + Math.round(pos.x), 'y: ' + Math.round(pos.y))
       }
       else {
-        console.log('MAP: Unable to generate. Trying again...')
         spawPlanets(quant, maxSize)
         break
       }
@@ -87,8 +83,6 @@ export default function createMap() {
 
   const prefixes = ['Moon of', 'Earth', 'Yela', 'Delamar', 'Old', 'Hurrance', 'Arch', 'York', 'Jhune', 'The', 'Boos', 'Horizon', 'New', 'Fars']
   const sufixes = [' Babbage', ' Pars', ' Aesis', ' Carachi', ' Fark', ' Lorville', ' Lagos', ' Deli', ' Dhaka', ' Anvil', ' Mirage', ' Dongguan']
-
-  const names = []
 
   function GenerateName(count) {
 
