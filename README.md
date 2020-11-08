@@ -51,3 +51,5 @@ Assim que conseguir isso criarei o jogo. Basta implementá-lo depois.
 
 *! Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)*
 
+**YouTube**: [HugoRodriguesQW](https://www.youtube.com/channel/UCqr7aW8KOD_hahUme4k_9Yw)
+
