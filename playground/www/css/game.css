@@ -1,0 +1,36 @@
+* {
+	font-family: 'Nunito', sans-serif;
+	margin: 0;
+}
+
+body {
+	cursor: pointer;
+	background: #000;
+	user-select: none;
+
+	margin-top: -0.7%;
+}
+
+#speed{
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #fff;
+  line-height: 1.1;
+
+  font-size: 12px;
+}
+
+.color-red{
+  color: rgb(156, 30, 30);
+}
+
+.color-green{
+  color: rgb(30, 156, 59);
+}
+
+.little {
+  padding-top: 10px;
+  line-height: 1.1;
+  font-size: 12px;
+}
