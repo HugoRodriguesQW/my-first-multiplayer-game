@@ -1,4 +1,4 @@
-export default function createGame(makeGravity, map, viewport) {
+export default function createGame(makeGravity, map, viewport, controller) {
 
   // FRAMES / SECONDS ( GAME SPEED )
   const fps = 60
@@ -7,8 +7,8 @@ export default function createGame(makeGravity, map, viewport) {
   const cam = {
     x: 0,
     y: 0,
-    width: 500,
-    height: 500,
+    width: viewport.width,
+    height: viewport.height,
     follow: function(target) {
       this.x = target.x - (viewport.width / 2)
       this.y = target.y - (viewport.height / 2)
@@ -252,37 +252,6 @@ export default function createGame(makeGravity, map, viewport) {
       }
     }
   }
-
-  // CONTROLLER AND SHIP MOVE
-  const controller = {
-    increaseSpeed: false,
-    decreaseSpeed: false,
-    rotateLeft: false,
-    rotateRight: false,
-
-    listen: function(command) {
-      let isPressed = command.type === 'keydown' ? true : false
-
-      switch (command.keyCode) {
-        case 87:
-          controller.increaseSpeed = isPressed
-          break
-        case 65:
-          controller.rotateLeft = isPressed
-          break
-        case 68:
-          controller.rotateRight = isPressed
-          break
-        case 83:
-          controller.decreaseSpeed = isPressed
-          break
-      }
-    }
-  }
-
-  document.addEventListener('keydown', controller.listen)
-  document.addEventListener('keyup', controller.listen)
-
 
   function moveShip(ship) {
     if (controller.increaseSpeed) {
