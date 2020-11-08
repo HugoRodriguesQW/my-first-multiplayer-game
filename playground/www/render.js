@@ -1,9 +1,33 @@
+export default function renderScreen(document, context, game, map, initialSize) {
+
+  const viewport = initialSize
+  const panels = {}
+
+  function addPanels(ids) {
+    ids.forEach((id) => {
+      const canvas = document.createElement('canvas')
+      canvas.width = viewport.x;
+      canvas.height = viewport.y;
+
+      const panel = {
+        img: canvas,
+        ctx: canvas.getContext('2d')
+      }
+
+      panels[id] = panel
+    })
+  }
+
+  addPanels(['stars', 'floor'])
+
+
 export default function renderScreen(document, context, game, map, viewport) {
 
   const back_canvas = document.createElement('canvas');
   back_canvas.width = viewport.x;
   back_canvas.height = viewport.y;
   const ctx = back_canvas.getContext('2d');
+
 
   const Interface = []
 
@@ -82,7 +106,11 @@ export default function renderScreen(document, context, game, map, viewport) {
 
 
 
+
+  function updateScreenPositions() {
+
   function updateScreenPositions(zeroPoint) {
+
     zeroScreenPosition.x = game.playerShip.x - viewport.x / 2
     zeroScreenPosition.y = game.playerShip.y - viewport.y / 2
 
@@ -123,6 +151,15 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   function update() {
 
+
+    panels.stars.ctx.beginPath()
+    panels.stars.ctx.clearRect(
+      game.playerShip.x - viewport.x / 1.8,
+      game.playerShip.y - viewport.y / 1.8,
+      viewport.x * 1.4, viewport.y * 1.4
+    )
+
+
     updateUI(game.exportData)
     DrawBackground()
     DrawStars()
@@ -143,6 +180,18 @@ export default function renderScreen(document, context, game, map, viewport) {
 
     // This render all UI in Interface (Array)
     Interface.forEach((ui) => {
+
+      DrawInterface(ui)
+    })
+
+    // Draw panels in Master Panel
+    context.clearRect(0, 0, viewport.x, viewport.y)
+    for (const id in panels) {
+      context.beginPath()
+      context.drawImage(panels[id].img, 0, 0)
+    }
+  }
+
       ctx.beginPath()
       for (const key in ui.stl) {
         ctx[key] = ui.stl[key]
@@ -154,9 +203,10 @@ export default function renderScreen(document, context, game, map, viewport) {
 
 
 
+
   function PlanetsPointers(center, planet) {
 
-
+    const ctx = panels.floor.ctx
     const dist = Math.sqrt((planet.x - center.x) ** 2 + (planet.y - center.y) ** 2);
     if (dist < 10000) {
 
@@ -170,6 +220,7 @@ export default function renderScreen(document, context, game, map, viewport) {
         x: Math.cos(angle),
         y: Math.sin(angle)
       }
+
 
       const point = {
         x: center.x + ((viewport.x / 2.2) * corr.x),
@@ -237,6 +288,77 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   // All 'Draw' functions are here:
   function DrawSpaceShips(ship) {
+
+    const ctx = panels.floor.ctx
+
+
+      const point = {
+        x: center.x + ((viewport.x / 2.2) * corr.x),
+        y: center.y + ((viewport.y / 2.2) * corr.y)
+      }
+
+
+      ctx.beginPath()
+      ctx.fillStyle = `hsla(${planet.color}, 100%, 37%, 1)`
+      ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, false)
+      ctx.fill()
+
+      ctx.beginPath()
+      for (const key in defaultUiConfig.style) {
+        ctx[key] = defaultUiConfig.style[key]
+      }
+      ctx.fillText((dist - planet.radius).toFixed(0), point.x + 5.5, point.y + 1.2);
+    }
+  }
+
+  function backgroundStarsEngine() {
+
+    const padding = 1.9
+    const limits = {
+      minX: game.playerShip.x - (viewport.x / padding),
+      maxX: game.playerShip.x + (viewport.x / padding),
+      minY: game.playerShip.y - (viewport.y / padding),
+      maxY: game.playerShip.y + (viewport.y / padding)
+    }
+
+    for (let i = bgStars.length; i < (maxStarts * Math.random()); i++) {
+      let color = 'white'
+      if (Math.random() < 0.1) {
+        color = `hsla(${Math.random()*360}, 100%, 65%, 1)`
+      }
+
+      bgStars.push(new star(
+        game.playerShip.x - (viewport.x / padding) + (viewport.x * padding) * Math.random(),
+        game.playerShip.y - (viewport.y / padding) + (viewport.y * padding) * Math.random(),
+        Math.random() + 0.01, color
+      ))
+    }
+
+    return limits
+  }
+
+  const CalcShipPoints = function(ship) {
+    const p = [{
+        x: ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian)),
+        y: ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian))
+      },
+
+      {
+        x: ship.x - ship.radius * (2 / 3 * Math.cos(ship.radian) + Math.sin(ship.radian)),
+        y: ship.y + ship.radius * (2 / 3 * Math.sin(ship.radian) - Math.cos(ship.radian))
+      },
+
+      {
+        x: ship.x - ship.radius * (2 / 3 * Math.cos(ship.radian) - Math.sin(ship.radian)),
+        y: ship.y + ship.radius * (2 / 3 * Math.sin(ship.radian) + Math.cos(ship.radian))
+      }
+    ]
+    return p
+  }
+
+  // All 'Draw' functions are here:
+  function DrawSpaceShips(ship) {
+
     ctx.beginPath()
     ctx.lineWidth = ship.size / 20
     ctx.strokeStyle = 'white'
@@ -254,6 +376,9 @@ export default function renderScreen(document, context, game, map, viewport) {
   }
 
   function DrawParticles(particle) {
+
+    const ctx = panels.floor.ctx
+
     ctx.save()
     ctx.globalAlpha = particle.apha
     ctx.beginPath()
@@ -267,6 +392,7 @@ export default function renderScreen(document, context, game, map, viewport) {
     ctx.restore()
   }
 
+
   function DrawPlanets(planet) {
     ctx.save()
     ctx.beginPath()
@@ -275,12 +401,55 @@ export default function renderScreen(document, context, game, map, viewport) {
     gradient.addColorStop(0, `hsla(${planet.color}, 100%, 65%, 1)`);
     gradient.addColorStop(1, `hsla(${planet.color}, 100%, 37%, 0.01)`);
 
-    ctx.fillStyle = gradient
-    ctx.arc(planet.x, planet.y, planet.radius * 1.6, 0, Math.PI * 2, false)
-    ctx.fill();
 
-    //draw a planet
+  function DrawPlanets(planet) {
+
+    const ctx = panels.floor.ctx
+
     ctx.beginPath()
+    
+    const dist = Math.sqrt((planet.x - game.playerShip.x) ** 2 + (planet.y - game.playerShip.y) ** 2);
+    if (dist < planet.radius * 4) {
+      ctx.save()
+      ctx.beginPath()
+      let gradient = ctx.createRadialGradient(
+        planet.x, planet.y, planet.radius / 4, planet.x, planet.y, planet.radius * 1.3);
+      gradient.addColorStop(0, `hsla(${planet.color}, 100%, 65%, 1)`);
+      gradient.addColorStop(1, `hsla(${planet.color}, 100%, 37%, 0.01)`);
+
+      ctx.fillStyle = gradient
+      ctx.arc(planet.x, planet.y, planet.radius * 1.6, 0, Math.PI * 2, false)
+      ctx.fill();
+
+      //draw a planet
+      ctx.beginPath()
+      gradient = ctx.createRadialGradient(
+        planet.x * 0.77, planet.y * 0.75, planet.radius / 2, planet.x * 0.75, planet.y * 0.75, planet.radius * 1.75);
+      gradient.addColorStop(0, `hsla(${planet.color}, 100%, 20%,1)`);
+      gradient.addColorStop(1, `hsla(${planet.color}, 100%, 37%, 1)`);
+
+      ctx.fillStyle = gradient
+      ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2, false)
+      ctx.fill()
+      ctx.restore()
+    }
+  }
+
+  function DrawInterface(ui) {
+    const ctx = panels.floor.ctx
+    ctx.beginPath()
+    for (const key in ui.stl) {
+      ctx[key] = ui.stl[key]
+    }
+    ctx.fillText(ui.value, ui.position.x, ui.position.y)
+    ctx.setTransform(1, 0, 0, 1, -game.cam.x, -game.cam.y)
+  }
+
+  function DrawStars() {
+    const starsCtx = panels.stars.ctx
+    starsCtx.setTransform(1, 0, 0, 1, -game.cam.x, -game.cam.y)
+    starsCtx.beginPath()
+
     gradient = ctx.createRadialGradient(
       planet.x * 0.77, planet.y * 0.75, planet.radius / 2, planet.x * 0.75, planet.y * 0.75, planet.radius * 1.75);
     gradient.addColorStop(0, `hsla(${planet.color}, 100%, 20%,1)`);
@@ -294,12 +463,38 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   function DrawStars() {
 
+
     const limits = backgroundStarsEngine()
 
     bgStars.forEach((star, num) => {
-      if (star.x < limits.minX || star.x > limits.maxX || star.y < limits.minY || star.y > limits.maxY) {
-        bgStars.splice(num, 1)
+      if (StarCanRender(star, limits)) {
+        starsCtx.beginPath()
+        starsCtx.fillStyle = star.color
+        starsCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2, false)
+        starsCtx.fill()
       }
+      else {
+        setTimeout(() => {
+          bgStars.splice(num, 1)
+        }, )
+      }
+
+    })
+
+  }
+
+  function StarCanRender(star, limits) {
+    let canRender = false
+    if (star.x > limits.minX && star.x < limits.maxX && star.y > limits.minY && star.y < limits.maxY) {
+      canRender = true
+    }
+    return canRender
+  }
+
+  function DrawBackground() {
+    const ctx = panels.floor.ctx
+    ctx.beginPath()
+
       else {
         ctx.beginPath()
         ctx.fillStyle = star.color
@@ -312,6 +507,7 @@ export default function renderScreen(document, context, game, map, viewport) {
   function DrawBackground() {
     ctx.beginPath()
     context.clearRect(0, 0, viewport.x, viewport.y)
+
 
     ctx.clearRect(
       game.playerShip.x - viewport.x / 2,
