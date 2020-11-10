@@ -1,9 +1,9 @@
-export default function createGame(makeGravity, map) {
+export default function createGame(makeGravity, map, controller) {
 
   // FRAMES / SECONDS ( GAME SPEED )
   const fps = 60
 
-  // GAME PREFABS
+
   class ship {
     constructor(position, size, rotation, turnSpeed, thrustSpeed, friction) {
       this.x = position.x
@@ -51,6 +51,7 @@ export default function createGame(makeGravity, map) {
     }
   }
 
+
   class engineParticle {
     constructor(x, y, radius, colors, speed, alphaRate, friciton) {
       this.x = x
@@ -70,26 +71,26 @@ export default function createGame(makeGravity, map) {
       this.y = this.y + this.speed.y
       this.apha -= this.alphaRate + 0.1
     }
-  } // END GAME PREFABS
+  }
 
 
-  // GAME OBJECTS CREATE
+
+
+
   const playerShip = new ship({
     x: 15000,
     y: 15000
   }, 20, 90, 360, 2, 0.1)
 
-  const spaceShips = []
+  const spaceShips = [playerShip]
   const particles = []
   const planets = []
 
-  // GAME OBJECTS PUSH
-  spaceShips.push(playerShip)
+
   map.planets.forEach((planet) => {
     planets.push(planet)
   })
 
-  // Data Game (export)
 
   class data {
     constructor(id, value) {
@@ -97,6 +98,9 @@ export default function createGame(makeGravity, map) {
       this.value = value
     }
   }
+
+
+
 
   const exportData = [
     new data('campAlt'),
@@ -115,10 +119,9 @@ export default function createGame(makeGravity, map) {
     })
   }
 
-  setInterval(update, 1000 / fps)
 
 
-  // UPDATE GAME
+
   function update() {
 
     // Display Update
@@ -166,6 +169,12 @@ export default function createGame(makeGravity, map) {
     })
   }
 
+  setInterval(update, 1000 / fps)
+
+
+
+
+
   function borderMapShipCheck(ship) {
     if (ship.x < 0 - ship.radius) {
       ship.x = map.mapSize.width
@@ -181,11 +190,10 @@ export default function createGame(makeGravity, map) {
     }
   }
 
-  // Insert Engine Particles
-  function engineParticles(ship) {
 
+
+  function engineParticles(ship) {
     setTimeout(() => {
-      // Remove Particles if alpha < 0
       particles.forEach((particle, index) => {
         if (particle.apha < 0) {
           particles.splice(index, 1)
@@ -196,7 +204,6 @@ export default function createGame(makeGravity, map) {
       })
     }, 0)
 
-    // Main Engine
     if (ship.thrusting) {
 
       const posX = ship.x - ship.radius * 4 / 3 * Math.cos(ship.radian)
@@ -224,7 +231,6 @@ export default function createGame(makeGravity, map) {
       }
     }
 
-    //Rotate Engines
     if (ship.rotation != 0) {
       const offset = ship.rotation > 0 ? -80 : 80
       const posX = ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian + offset))
@@ -239,37 +245,6 @@ export default function createGame(makeGravity, map) {
       }
     }
   }
-
-  // CONTROLLER AND SHIP MOVE
-  const controller = {
-    increaseSpeed: false,
-    decreaseSpeed: false,
-    rotateLeft: false,
-    rotateRight: false,
-
-    listen: function(command) {
-      let isPressed = command.type === 'keydown' ? true : false
-
-      switch (command.keyCode) {
-        case 87:
-          controller.increaseSpeed = isPressed
-          break
-        case 65:
-          controller.rotateLeft = isPressed
-          break
-        case 68:
-          controller.rotateRight = isPressed
-          break
-        case 83:
-          controller.decreaseSpeed = isPressed
-          break
-      }
-    }
-  }
-
-  document.addEventListener('keydown', controller.listen)
-  document.addEventListener('keyup', controller.listen)
-
 
   function moveShip(ship) {
     if (controller.increaseSpeed) {

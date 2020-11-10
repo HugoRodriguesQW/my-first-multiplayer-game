@@ -23,14 +23,14 @@
 	<canvas id="game-area"></canvas>
 
 	<script type="module">
-	import createGame from './game.js'
+	  import makeInputListener from './input.js'
+	  import createGame from './game.js'
     import createMap from './map.js'
     import makeGravity from './gravity.js'
     import renderScreen from './render.js'
 
     // HTML
     const area = document.getElementById('game-area')
-
     area.width = window.innerWidth
     area.height =  window.innerHeight
     const ctx = area.getContext('2d')
@@ -38,8 +38,8 @@
     const map = createMap()
     map.spawPlanets(10,900)
 
-
-    const game = createGame(makeGravity, map)
+    const controller = makeInputListener(document)
+    const game = createGame(makeGravity, map, controller)
 
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
     render.addUI([
