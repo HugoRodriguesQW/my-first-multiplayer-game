@@ -21,7 +21,6 @@
 <body>
 
 	<canvas id="game-area"></canvas>
-	<canvas id="ui-area"></canvas>
 
 	<script type="module">
 	import createGame from './game.js'
@@ -29,18 +28,18 @@
     import makeGravity from './gravity.js'
     import renderScreen from './render.js'
 
-
     // HTML
     const area = document.getElementById('game-area')
-    area.width = innerWidth
-    area.height = innerHeight
+
+    area.width = window.innerWidth
+    area.height =  window.innerHeight
     const ctx = area.getContext('2d')
 
     const map = createMap()
     map.spawPlanets(10,900)
 
 
-    const game = createGame(makeGravity, map, area)
+    const game = createGame(makeGravity, map)
 
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
     render.addUI([
@@ -48,7 +47,8 @@
     {id: 'velY', 	pos: 'top-left-2', style: {fillStyle: 'green'}},
     {id: 'campAlt', pos: 'top-left-3'},
     {id: 'posX', 	pos: 'middle-left'},
-    {id: 'posY', 	pos: 'bottom-center'}
+    {id: 'posY', 	pos: 'bottom-center', style: {textAlign: 'center'}},
+    {id: 'planetOrbiting', 	pos: 'top-center', val: 'planetOrbiting', style: {textAlign: 'center'}}
     ])
 
     function requestRender ()
