@@ -1,19 +1,7 @@
-export default function createGame(makeGravity, map, viewport) {
+export default function createGame(makeGravity, map) {
 
   // FRAMES / SECONDS ( GAME SPEED )
   const fps = 60
-
-  // CURRENT PLAYER CAMERA
-  const cam = {
-    x: 0,
-    y: 0,
-    width: 500,
-    height: 500,
-    follow: function(target) {
-      this.x = target.x - (viewport.width / 2)
-      this.y = target.y - (viewport.height / 2)
-    }
-  }
 
   // GAME PREFABS
   class ship {
@@ -104,7 +92,7 @@ export default function createGame(makeGravity, map, viewport) {
   // Data Game (export)
 
   class data {
-    constructor(id, value, target) {
+    constructor(id, value) {
       this.id = id
       this.value = value
     }
@@ -115,7 +103,8 @@ export default function createGame(makeGravity, map, viewport) {
     new data('velX'),
     new data('velY'),
     new data('posX'),
-    new data('posY')
+    new data('posY'),
+    new data('planetOrbiting')
   ]
 
   function renewData(id, newVal) {
@@ -142,12 +131,8 @@ export default function createGame(makeGravity, map, viewport) {
     moveShip(playerShip)
     borderMapShipCheck(playerShip)
 
-    // CAMERA UPDATE
-    cam.follow(playerShip)
-
-
     // CHECK OBJECTS APPROACH
-    map.planets.forEach((planet, index) => {
+    map.planets.forEach((planet) => {
 
       const dist = Math.hypot(Math.sqrt((planet.x - playerShip.x) ** 2 + (planet.y - playerShip.y) ** 2))
 
@@ -155,9 +140,11 @@ export default function createGame(makeGravity, map, viewport) {
         playerShip.Orbiting.push(planet);
         playerShip.alt = 'Altitude: ' + (dist - planet.radius).toFixed(1) + ' Km'
         renewData('campAlt', 'Altitude: ' + (dist - planet.radius).toFixed(1) + ' Km')
+        renewData('planetOrbiting', planet.name)
       }
       else if (playerShip.Orbiting.length == 0) {
         renewData('campAlt', ' ')
+        renewData('planetOrbiting', ' ')
       }
 
     })
@@ -316,7 +303,6 @@ export default function createGame(makeGravity, map, viewport) {
 
   return {
     fps,
-    cam,
     playerShip,
     spaceShips,
     planets,

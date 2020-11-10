@@ -1,18 +1,50 @@
 export default function renderScreen(document, context, game, map, viewport) {
 
-  const back_canvas = document.createElement('canvas');
-  back_canvas.width = viewport.x;
-  back_canvas.height = viewport.y;
-  const ctx = back_canvas.getContext('2d');
+
+  const panel = document.createElement('canvas')
+  panel.width = viewport.x
+  panel.height = viewport.y
+  const ctx = panel.getContext('2d')
+
+  const cam = {
+    x: 0,
+    y: 0,
+    follow: function(target) {
+      this.x = target.x - (viewport.x / 2)
+      this.y = target.y - (viewport.y / 2)
+    }
+  }
 
   const Interface = []
+
+  const fontSize = function() {
+    const sizes = {
+      'mobile': Math.floor(1.4 * (viewport.x / 100)),
+      'middle': Math.floor(1.1 * (viewport.x / 100)),
+      'desktop': Math.floor(0.9 * (viewport.x / 100))
+    }
+    let selected = ''
+
+    // if... {need change}
+    if (viewport.x > 1280) {
+      selected = 'desktop'
+    }
+    else if (viewport.x < 1280) {
+      selected = 'middle'
+    }
+    else if (viewport.x < 680) {
+      selected = 'mobile'
+    }
+    return sizes[selected]
+  }()
 
   let zeroScreenPosition = { x: 0, y: 0 }
 
   const screenPositions = {
+    'top-center': { x: viewport.x / 2, y: 30 },
     'top-left-1': { x: 10, y: 30 },
-    'top-left-2': { x: 10, y: 40 },
-    'top-left-3': { x: 10, y: 50 },
+    'top-left-2': { x: 10, y: 34 + fontSize },
+    'top-left-3': { x: 10, y: 44 + fontSize },
     'middle-left': { x: 10, y: viewport.y / 2 },
     'bottom-center': { x: viewport.x / 2, y: viewport.y - 10 }
   }
@@ -21,7 +53,7 @@ export default function renderScreen(document, context, game, map, viewport) {
     value: 'empty',
     style: {
       fillStyle: 'white',
-      font: '9px Nunito',
+      font: `bold 9px Nunito`,
       textBaseline: 'middle'
     },
     position: zeroScreenPosition
@@ -80,9 +112,9 @@ export default function renderScreen(document, context, game, map, viewport) {
     }
   }
 
+  console.log(Interface)
 
-
-  function updateScreenPositions(zeroPoint) {
+  function updateScreenPositions() {
     zeroScreenPosition.x = game.playerShip.x - viewport.x / 2
     zeroScreenPosition.y = game.playerShip.y - viewport.y / 2
 
@@ -123,6 +155,9 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   function update() {
 
+    // CAMERA UPDATE
+    cam.follow(game.playerShip)
+
     updateUI(game.exportData)
     DrawBackground()
     DrawStars()
@@ -143,13 +178,15 @@ export default function renderScreen(document, context, game, map, viewport) {
 
     // This render all UI in Interface (Array)
     Interface.forEach((ui) => {
+      ctx.save()
       ctx.beginPath()
       for (const key in ui.stl) {
         ctx[key] = ui.stl[key]
       }
       ctx.fillText(ui.value, ui.position.x, ui.position.y)
+      ctx.restore()
     })
-    context.drawImage(back_canvas, 0, 0)
+    context.drawImage(panel, 0, 0)
   }
 
 
@@ -314,12 +351,12 @@ export default function renderScreen(document, context, game, map, viewport) {
     context.clearRect(0, 0, viewport.x, viewport.y)
 
     ctx.clearRect(
-      game.playerShip.x - viewport.x / 2,
-      game.playerShip.y - viewport.y / 2,
-      viewport.x, viewport.y
+      game.playerShip.x - viewport.x / 1.9,
+      game.playerShip.y - viewport.y / 1.9,
+      viewport.x * 1.1, viewport.y * 1.1
     )
 
-    ctx.setTransform(1, 0, 0, 1, -game.cam.x, -game.cam.y)
+    ctx.setTransform(1, 0, 0, 1, -cam.x, -cam.y)
   }
 
   return {
