@@ -162,11 +162,6 @@ export default function renderScreen(document, context, game, map, viewport) {
     DrawBackground()
     DrawStars()
 
-    // These are requests for 'Draw' functions (Object)
-    game.shoots.forEach((shoot) => {
-      DrawShoots(shoot)
-    })
-
     game.spaceShips.forEach((ship) => {
       DrawSpaceShips(ship)
     })
@@ -309,7 +304,6 @@ export default function renderScreen(document, context, game, map, viewport) {
   }
 
   function DrawShoots(shoot) {
-
     ctx.beginPath()
     ctx.fillStyle = shoot.color
     ctx.arc(shoot.x, shoot.y, shoot.size, 0, Math.PI * 2, false)
