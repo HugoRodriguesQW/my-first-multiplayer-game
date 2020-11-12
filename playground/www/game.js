@@ -20,7 +20,7 @@ export default function createGame(makeGravity, map, controller) {
       this.thrust = { x: 0, y: 0 }
       this.friction = friction || 0.45
 
-      this.mass = this.radius * 2
+      this.mass = this.radius * 4
       this.velocity = { x: 0, y: 0 }
       this.theta = 0
       this.orbitHeight = 0
@@ -44,9 +44,10 @@ export default function createGame(makeGravity, map, controller) {
         this.thrust.x = this.thrust.x + this.thrustSpeed * Math.cos(this.radian) / fps
         this.thrust.y = this.thrust.y - this.thrustSpeed * Math.sin(this.radian) / fps
       }
-      else if (this.decrease) {
-        this.thrust.x = this.thrust.x - this.thrustSpeed * Math.cos(this.radian) / (fps * 2)
-        this.thrust.y = this.thrust.y + this.thrustSpeed * Math.sin(this.radian) / (fps * 2)
+
+      if (this.decrease) {
+        this.thrust.x = this.thrust.x - (this.thrustSpeed / 4) * Math.cos(this.radian) / fps
+        this.thrust.y = this.thrust.y + (this.thrustSpeed / 4) * Math.sin(this.radian) / fps
       }
       this.move()
     }
@@ -66,11 +67,11 @@ export default function createGame(makeGravity, map, controller) {
       this.x = x
       this.y = y
       this.radius = radius
-      this.colors = colors == undefined ? ['red', 'yellow'] : colors
+      this.colors = colors || ['red', 'yellow']
       this.speed = speed
       this.apha = 1
       this.alphaRate = alphaRate
-      this.friction = friciton == undefined ? 0.98 : friciton
+      this.friction = friciton || 0.98
     }
 
     update() {
@@ -86,20 +87,13 @@ export default function createGame(makeGravity, map, controller) {
 
 
 
-  const playerShip = new ship({
-    x: 100,
-    y: 100
-  }, 20, 90, 360, 2, 0.1)
+  const playerShip = new ship({ x: 100, y: 100 },
+    20, 90, 360, 2, 0.1)
 
 
   const spaceShips = [playerShip]
   const particles = []
-  const planets = []
-
-  map.planets.forEach((planet) => {
-    planets.push(planet)
-  })
-
+  const planets = map.planets
 
   class data {
     constructor(id, value) {
@@ -107,8 +101,6 @@ export default function createGame(makeGravity, map, controller) {
       this.value = value
     }
   }
-
-
 
 
   const exportData = [
@@ -120,12 +112,13 @@ export default function createGame(makeGravity, map, controller) {
     new data('planetOrbiting')
   ]
 
+
   function renewData(id, newVal) {
-    exportData.forEach((data) => {
-      if (data.id === id) {
-        data.value = newVal
+    for (const data in exportData) {
+      if (exportData[data].id === id) {
+        exportData[data].value = newVal
       }
-    })
+    }
   }
 
 
@@ -241,6 +234,13 @@ export default function createGame(makeGravity, map, controller) {
     }
   }
 
+  const deltaParticles = {
+    colors: {
+      main: ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'],
+      gases: ['#ededed', '#c4c4c4']
+    }
+  }
+
   function engineParticles(ship) {
 
     setTimeout(() => {
@@ -259,7 +259,6 @@ export default function createGame(makeGravity, map, controller) {
       const posX = (ship.x - ship.radius * 4 / 3 * Math.cos(ship.radian)) + Math.random()
       const posY = (ship.y + ship.radius * 4 / 3 * Math.sin(ship.radian)) + Math.random()
       const particleSize = Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10)
-      const particleColors = ['rgb(32, 159, 233)', 'rgb(149, 208, 247)']
       const particleAlpha = 0.4 * (Math.random() + 0.5)
 
       const direction = {
@@ -269,7 +268,7 @@ export default function createGame(makeGravity, map, controller) {
 
       for (let i = 0; i < 7; i++) {
         particles.push(new engineParticle(
-          posX, posY, particleSize, particleColors, direction,
+          posX, posY, particleSize, deltaParticles.colors.main, direction,
           particleAlpha
         ))
       }
@@ -280,7 +279,6 @@ export default function createGame(makeGravity, map, controller) {
       const posX = ship.x + ship.radius * 4 / 3 * Math.cos(ship.radian) * 1.2
       const posY = ship.y - ship.radius * 4 / 3 * Math.sin(ship.radian) * 1.2
       const particleSize = Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10)
-      const particleColors = ['#ededed', '#c4c4c4']
       const particleAlpha = 0.9 * (Math.random() + 0.5)
 
       const direction = {
@@ -291,7 +289,7 @@ export default function createGame(makeGravity, map, controller) {
       for (let i = 0; i < 5; i++) {
 
         particles.push(new engineParticle(
-          posX, posY, particleSize, particleColors, direction, particleAlpha, 0.39
+          posX, posY, particleSize, deltaParticles.colors.gases, direction, particleAlpha, 0.39
         ))
       }
     }
@@ -301,7 +299,6 @@ export default function createGame(makeGravity, map, controller) {
       const posX = ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian + offset))
       const posY = ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian + offset))
       const particleSize = Math.random() * (3)
-      const particleColors = ['#ededed', '#c4c4c4']
       const particleAlpha = 0.9 * (Math.random() + 0.5)
 
       const direction = {
@@ -312,7 +309,7 @@ export default function createGame(makeGravity, map, controller) {
       for (let i = 0; i < 5; i++) {
 
         particles.push(new engineParticle(
-          posX, posY, particleSize, particleColors, direction, particleAlpha, 0.28
+          posX, posY, particleSize, deltaParticles.colors.gases, direction, particleAlpha, 0.28
         ))
       }
     }
