@@ -87,8 +87,8 @@ export default function createGame(makeGravity, map, controller) {
 
 
   const playerShip = new ship({
-    x: 15000,
-    y: 15000
+    x: 100,
+    y: 100
   }, 20, 90, 360, 2, 0.1)
 
 
@@ -181,21 +181,6 @@ export default function createGame(makeGravity, map, controller) {
 
 
 
-  function borderMapShipCheck(ship) {
-    if (ship.x < 0 - ship.radius) {
-      ship.x = map.mapSize.width
-    }
-    if (ship.x > map.mapSize.width + ship.radius) {
-      ship.x = 0
-    }
-    if (ship.y < 0 - ship.radius) {
-      ship.y = map.mapSize.height
-    }
-    if (ship.y > map.mapSize.height + ship.radius) {
-      ship.y = 0
-    }
-  }
-
   function moveShip(ship) {
     if (controller.increaseSpeed) {
       ship.thrusting = true
@@ -226,6 +211,34 @@ export default function createGame(makeGravity, map, controller) {
     engineParticles(playerShip)
 
     borderMapShipCheck(playerShip)
+  }
+
+  const cases = {
+    outsideVertical: (posY) => {
+      return posY < 1 ? 'top' : posY > map.mapSize.height - 1 ? 'bottom' : false
+    },
+    outsideHorizontal: (posX) => {
+      return posX < 1 ? 'left' : posX > map.mapSize.width - 1 ? 'right' : false
+    },
+  }
+
+  function borderMapShipCheck(ship) {
+
+    switch (cases.outsideVertical(ship.y)) {
+      case 'top':
+        ship.y = map.mapSize.height - ship.radius * 2
+        break
+      case 'bottom':
+        ship.y = 0 + ship.radius * 2
+    }
+
+    switch (cases.outsideHorizontal(ship.x)) {
+      case 'left':
+        ship.x = map.mapSize.width - ship.radius * 2
+        break
+      case 'right':
+        ship.x = 0 + ship.radius * 2
+    }
   }
 
   function engineParticles(ship) {
