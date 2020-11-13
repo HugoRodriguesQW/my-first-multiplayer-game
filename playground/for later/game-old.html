@@ -133,9 +133,9 @@
 
       //Import the score text
       const scoreUI = document.getElementById('score')
-      let score = 0; 
+      let score = 0;
       let AddToScore = 0;
-      
+
       //Import message-box and elements
       const msgBox = document.getElementById('message-box')
       const msgScore = document.getElementById('game-over-points')
@@ -145,7 +145,7 @@
 
       // prefabs or class {}
       class playerPrefab {
-        constructor(x, y, radius, color){ 
+        constructor(x, y, radius, color){
           this.x = x
           this.y = y
           this.radius = radius
@@ -154,14 +154,14 @@
 
         draw(){
         ctx.beginPath()
-        ctx.fillStyle = this.color 
+        ctx.fillStyle = this.color
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
         ctx.fill()
         }
       }
 
       class enemyPrefab {
-        constructor(x, y, radius, color, target, velocity){ 
+        constructor(x, y, radius, color, target, velocity){
           this.x = x
           this.y = y
           this.radius = radius
@@ -175,7 +175,7 @@
 
         draw(){
           ctx.beginPath()
-          ctx.fillStyle = this.color 
+          ctx.fillStyle = this.color
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
           ctx.fill()
         }
@@ -184,7 +184,7 @@
           this.draw()
 
           this.angle = Math.atan2(
-          (this.target.y) - this.y, 
+          (this.target.y) - this.y,
           (this.target.x) - this.x)
 
           this.speed = {
@@ -194,12 +194,12 @@
 
           this.x = this.x + this.speed.x
           this.y = this.y + this.speed.y
-  
+
         }
       }
 
       class particlePrefab {
-        constructor(x, y, radius, color, speed, alphaRate){ 
+        constructor(x, y, radius, color, speed, alphaRate){
           this.x = x
           this.y = y
           this.radius = radius
@@ -215,7 +215,7 @@
           ctx.save()
           ctx.globalAlpha = this.apha
           ctx.beginPath()
-          ctx.fillStyle = this.color 
+          ctx.fillStyle = this.color
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
           ctx.fill()
           ctx.restore()
@@ -243,13 +243,13 @@
 
         draw(){
           ctx.beginPath()
-          ctx.fillStyle = this.color 
+          ctx.fillStyle = this.color
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
           ctx.fill()
         }
 
         update() {
-          this.draw() 
+          this.draw()
           this.x = this.x + this.speed.x
           this.y = this.y + this.speed.y
         }
@@ -262,7 +262,7 @@
           10,
           'white'
         )
-      
+
       let enemies = []
       let shoots = []
       let particles = []
@@ -289,7 +289,7 @@
         AddToScore = score
         scoreUI.innerHTML = score
       }
-      
+
       function updateScore(){
 
         const update = requestAnimationFrame(updateScore)
@@ -303,16 +303,16 @@
 
         scoreUI.innerHTML = score
       }
-      
+
       function spawnEnemys() {
-        
+
         const spawn = setInterval( () => {
-        
+
           const color = `hsl(${Math.random() * 360}, 50%, 50%)`
           const velocity = 0.9
           const radius = Math.random() * (30 - 6) + 6
           const pos = {
-            x: 0, 
+            x: 0,
             y: 0
           }
           if(Math.random() > 0.5){
@@ -323,7 +323,7 @@
             pos.y = Math.random()  < 0.5 ? 0 - radius : canvas.width + radius
           }
           const targetInitial = {
-            x: player.x, 
+            x: player.x,
             y: player.y
           }
           enemies.push(new enemyPrefab(
@@ -333,17 +333,17 @@
            clearInterval(spawn)
           }
         }, 1200)
-        
+
       }
- 
+
       function animate() {
         const animation = requestAnimationFrame(animate)
 
-        ctx.fillStyle = "rgba(0, 0, 0, 0.1)" 
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"
         ctx.fillRect(0,0,canvas.width,canvas.height)
-        
+
         player.draw()
-   
+
         particles.forEach((particle, pIndex) =>{
           if(particle.apha < 0){
             particles.splice(pIndex, 1)
@@ -357,7 +357,7 @@
 
           // Remove the shoot if outside of screen
           if(
-            shoot.x - shoot.radius < 0 || 
+            shoot.x - shoot.radius < 0 ||
             shoot.x - shoot.radius > canvas.width ||
             shoot.y - shoot.radius < 0 ||
             shoot.y - shoot.radius > canvas.height
@@ -368,13 +368,13 @@
 
         enemies.forEach((enemy, index) => {
           enemy.update()
-          
+
           const distPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y)
 
           // Game Over
           if(distPlayer - enemy.radius - player.radius < 1)
           {
-           
+
             cancelAnimationFrame(animation)
             enableSpawn = false
             msgBox.style.display = 'flex'
@@ -382,7 +382,7 @@
           }
 
            // Check the collision between shots and enemies
-          shoots.forEach((shoot , shootIndex) => {  
+          shoots.forEach((shoot , shootIndex) => {
             const dist = Math.hypot(shoot.x - enemy.x, shoot.y - enemy.y)
 
             //If enemy-shoot collision
@@ -390,9 +390,9 @@
             {
 
               const angle = Math.atan2(
-                shoot.y - enemy.y, 
+                shoot.y - enemy.y,
                 shoot.x - enemy.x)
-              
+
               //Emit particles
               for(let i=0; i < enemy.radius; i++){
 
@@ -403,13 +403,13 @@
                     }, 0.0067
                 ))
               }
-              //Check (radius,delete) 
+              //Check (radius,delete)
               if(enemy.radius -8 > 8)
               {
                 gsap.to(enemy, {
                 radius: enemy.radius - 8
                 })
-            
+
                 setTimeout(() => {
                   shoots.splice(shootIndex, 1)
                 }, 0)
@@ -435,23 +435,23 @@
       // Mouse Listener
       addEventListener('click', (event) => {
         const angle = Math.atan2(
-          event.clientY - player.y, 
+          event.clientY - player.y,
           event.clientX - player.x)
-        
+
         const speed = {
             x: Math.cos(angle) * 8,
             y: Math.sin(angle) * 8
         }
         const shoot = shoots.push(new shootPrefab(
-            player.x, 
-            player.y, 
+            player.x,
+            player.y,
             4,'white', speed
         ))
 
         for(let i=0; i < 8; i++){
           particles.push(new particlePrefab(
             player.x + speed.x, player.y + speed.y, Math.random() * 1.1 , 'white', {
-              x: (speed.x / 4) * Math.random(), 
+              x: (speed.x / 4) * Math.random(),
               y: (speed.y / 4) * Math.random()}, 0.01
           ))
         }
@@ -465,7 +465,7 @@
         enableSpawn = true
         spawnEnemys()
         msgBox.style.display = 'none'
-        
+
       })
 
       //Diconnect

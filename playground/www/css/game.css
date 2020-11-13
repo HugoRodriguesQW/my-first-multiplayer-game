@@ -1,6 +1,8 @@
 * {
 	font-family: 'Nunito', sans-serif;
 	margin: 0;
+	user-select: none;
+	cursor: crosshair;
 }
 
 body {

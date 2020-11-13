@@ -1,30 +1,25 @@
-// Beautiful, no dependencies
+const prefixes = ['Moon of', 'Earth', 'Yela', 'Delamar', 'Old', 'Hurrance', 'Arch', 'York', 'Jhune', 'The', 'Boos', 'Horizon', 'New', 'Fars']
+const sufixes = [' Babbage', ' Pars', ' Aesis', ' Carachi', ' Fark', ' Lorville', ' Lagos', ' Deli', ' Dhaka', ' Anvil', ' Mirage', ' Dongguan']
 
-export default function createMap() {
+export default function createMap(size) {
 
-  const mapSize = {
-    width: 30000,
-    height: 30000
-  }
+  const mapSize = size || { width: 30000, height: 30000 }
 
+  const planets = []
+  const names = []
 
   class planet {
     constructor(x, y, radius, color, name) {
+      this.name = name
+
       this.x = x
       this.y = y
       this.radius = radius
       this.color = color
-
       this.orbitRange = this.radius * 2.5
       this.mass = this.radius * 2
-
-      this.name = name
     }
-
   }
-
-  const planets = []
-  const names = []
 
   function spawPlanets(quant, maxSize) {
 
@@ -81,8 +76,6 @@ export default function createMap() {
     return collision
   }
 
-  const prefixes = ['Moon of', 'Earth', 'Yela', 'Delamar', 'Old', 'Hurrance', 'Arch', 'York', 'Jhune', 'The', 'Boos', 'Horizon', 'New', 'Fars']
-  const sufixes = [' Babbage', ' Pars', ' Aesis', ' Carachi', ' Fark', ' Lorville', ' Lagos', ' Deli', ' Dhaka', ' Anvil', ' Mirage', ' Dongguan']
 
   function GenerateName(count) {
 

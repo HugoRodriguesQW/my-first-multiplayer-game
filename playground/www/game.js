@@ -1,9 +1,9 @@
-export default function createGame(makeGravity, map) {
+export default function createGame(makeGravity, map, controller) {
 
   // FRAMES / SECONDS ( GAME SPEED )
   const fps = 60
 
-  // GAME PREFABS
+
   class ship {
     constructor(position, size, rotation, turnSpeed, thrustSpeed, friction) {
       this.x = position.x
@@ -16,11 +16,11 @@ export default function createGame(makeGravity, map) {
       this.thrusting = false
       this.decrease = false
       this.rotate = 0
-      this.thrustSpeed = thrustSpeed == undefined ? 5 : thrustSpeed
+      this.thrustSpeed = thrustSpeed || 5
       this.thrust = { x: 0, y: 0 }
-      this.friction = friction == undefined ? 0.45 : friction
+      this.friction = friction || 0.45
 
-      this.mass = this.radius * 2
+      this.mass = this.radius * 4
       this.velocity = { x: 0, y: 0 }
       this.theta = 0
       this.orbitHeight = 0
@@ -28,6 +28,7 @@ export default function createGame(makeGravity, map) {
       this.Orbiting = []
       this.alt = ''
 
+      this.guns = []
     }
 
     move() {
@@ -43,24 +44,34 @@ export default function createGame(makeGravity, map) {
         this.thrust.x = this.thrust.x + this.thrustSpeed * Math.cos(this.radian) / fps
         this.thrust.y = this.thrust.y - this.thrustSpeed * Math.sin(this.radian) / fps
       }
-      else if (this.decrease) {
-        this.thrust.x = this.thrust.x - this.thrustSpeed * Math.cos(this.radian) / (fps * 2)
-        this.thrust.y = this.thrust.y + this.thrustSpeed * Math.sin(this.radian) / (fps * 2)
+
+      if (this.decrease) {
+        this.thrust.x = this.thrust.x - (this.thrustSpeed / 4) * Math.cos(this.radian) / fps
+        this.thrust.y = this.thrust.y + (this.thrustSpeed / 4) * Math.sin(this.radian) / fps
       }
       this.move()
     }
   }
+
+  class gun {
+    constructor() {
+
+    }
+
+
+  }
+
 
   class engineParticle {
     constructor(x, y, radius, colors, speed, alphaRate, friciton) {
       this.x = x
       this.y = y
       this.radius = radius
-      this.colors = colors == undefined ? ['red', 'yellow'] : colors
+      this.colors = colors || ['red', 'yellow']
       this.speed = speed
       this.apha = 1
       this.alphaRate = alphaRate
-      this.friction = friciton == undefined ? 0.98 : friciton
+      this.friction = friciton || 0.98
     }
 
     update() {
@@ -70,26 +81,19 @@ export default function createGame(makeGravity, map) {
       this.y = this.y + this.speed.y
       this.apha -= this.alphaRate + 0.1
     }
-  } // END GAME PREFABS
+  }
 
 
-  // GAME OBJECTS CREATE
-  const playerShip = new ship({
-    x: 15000,
-    y: 15000
-  }, 20, 90, 360, 2, 0.1)
 
-  const spaceShips = []
+
+
+  const playerShip = new ship({ x: 100, y: 100 },
+    20, 90, 360, 2, 0.1)
+
+
+  const spaceShips = [playerShip]
   const particles = []
-  const planets = []
-
-  // GAME OBJECTS PUSH
-  spaceShips.push(playerShip)
-  map.planets.forEach((planet) => {
-    planets.push(planet)
-  })
-
-  // Data Game (export)
+  const planets = map.planets
 
   class data {
     constructor(id, value) {
@@ -97,6 +101,7 @@ export default function createGame(makeGravity, map) {
       this.value = value
     }
   }
+
 
   const exportData = [
     new data('campAlt'),
@@ -107,18 +112,18 @@ export default function createGame(makeGravity, map) {
     new data('planetOrbiting')
   ]
 
+
   function renewData(id, newVal) {
-    exportData.forEach((data) => {
-      if (data.id === id) {
-        data.value = newVal
+    for (const data in exportData) {
+      if (exportData[data].id === id) {
+        exportData[data].value = newVal
       }
-    })
+    }
   }
 
-  setInterval(update, 1000 / fps)
 
 
-  // UPDATE GAME
+
   function update() {
 
     // Display Update
@@ -129,7 +134,6 @@ export default function createGame(makeGravity, map) {
 
     // SHIPS UPDATE
     moveShip(playerShip)
-    borderMapShipCheck(playerShip)
 
     // CHECK OBJECTS APPROACH
     map.planets.forEach((planet) => {
@@ -166,109 +170,8 @@ export default function createGame(makeGravity, map) {
     })
   }
 
-  function borderMapShipCheck(ship) {
-    if (ship.x < 0 - ship.radius) {
-      ship.x = map.mapSize.width
-    }
-    if (ship.x > map.mapSize.width + ship.radius) {
-      ship.x = 0
-    }
-    if (ship.y < 0 - ship.radius) {
-      ship.y = map.mapSize.height
-    }
-    if (ship.y > map.mapSize.height + ship.radius) {
-      ship.y = 0
-    }
-  }
+  setInterval(update, 1000 / fps)
 
-  // Insert Engine Particles
-  function engineParticles(ship) {
-
-    setTimeout(() => {
-      // Remove Particles if alpha < 0
-      particles.forEach((particle, index) => {
-        if (particle.apha < 0) {
-          particles.splice(index, 1)
-        }
-        else {
-          particle.update()
-        }
-      })
-    }, 0)
-
-    // Main Engine
-    if (ship.thrusting) {
-
-      const posX = ship.x - ship.radius * 4 / 3 * Math.cos(ship.radian)
-      const posY = ship.y + ship.radius * 4 / 3 * Math.sin(ship.radian)
-
-      for (let i = 0; i < 5; i++) {
-
-        particles.push(new engineParticle(
-          posX + Math.random(), posY + Math.random(), Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10), ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'], { x: posX - (ship.x) + Math.random() * 2, y: posY - (ship.y) + Math.random() * 2 },
-          0.4 * (Math.random() + 0.5)
-        ))
-      }
-    }
-
-    if (ship.decrease) {
-      const posX = ship.x + ship.radius * 4 / 3 * Math.cos(ship.radian) * 1.2
-      const posY = ship.y - ship.radius * 4 / 3 * Math.sin(ship.radian) * 1.2
-
-      for (let i = 0; i < 5; i++) {
-
-        particles.push(new engineParticle(
-          posX, posY, Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10), ['#ededed', '#c4c4c4'], { x: posX - (ship.x + ship.thrust.x) + Math.random() * 2, y: posY - (ship.y + ship.thrust.y) + Math.random() * 2 },
-          0.9 * (Math.random() + 0.5), 0.39
-        ))
-      }
-    }
-
-    //Rotate Engines
-    if (ship.rotation != 0) {
-      const offset = ship.rotation > 0 ? -80 : 80
-      const posX = ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian + offset))
-      const posY = ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian + offset))
-
-      for (let i = 0; i < 5; i++) {
-
-        particles.push(new engineParticle(
-          posX, posY, Math.random() * (3), ['#ededed', '#c4c4c4'], { x: posX - (ship.x + ship.thrust.x) - Math.random(), y: posY - (ship.y + ship.thrust.y) - Math.random() },
-          0.9 * (Math.random() + 0.5), 0.28
-        ))
-      }
-    }
-  }
-
-  // CONTROLLER AND SHIP MOVE
-  const controller = {
-    increaseSpeed: false,
-    decreaseSpeed: false,
-    rotateLeft: false,
-    rotateRight: false,
-
-    listen: function(command) {
-      let isPressed = command.type === 'keydown' ? true : false
-
-      switch (command.keyCode) {
-        case 87:
-          controller.increaseSpeed = isPressed
-          break
-        case 65:
-          controller.rotateLeft = isPressed
-          break
-        case 68:
-          controller.rotateRight = isPressed
-          break
-        case 83:
-          controller.decreaseSpeed = isPressed
-          break
-      }
-    }
-  }
-
-  document.addEventListener('keydown', controller.listen)
-  document.addEventListener('keyup', controller.listen)
 
 
   function moveShip(ship) {
@@ -299,6 +202,117 @@ export default function createGame(makeGravity, map) {
 
     ship.engine()
     engineParticles(playerShip)
+
+    borderMapShipCheck(playerShip)
+  }
+
+  const cases = {
+    outsideVertical: (posY) => {
+      return posY < 1 ? 'top' : posY > map.mapSize.height - 1 ? 'bottom' : false
+    },
+    outsideHorizontal: (posX) => {
+      return posX < 1 ? 'left' : posX > map.mapSize.width - 1 ? 'right' : false
+    },
+  }
+
+  function borderMapShipCheck(ship) {
+
+    switch (cases.outsideVertical(ship.y)) {
+      case 'top':
+        ship.y = map.mapSize.height - ship.radius * 2
+        break
+      case 'bottom':
+        ship.y = 0 + ship.radius * 2
+    }
+
+    switch (cases.outsideHorizontal(ship.x)) {
+      case 'left':
+        ship.x = map.mapSize.width - ship.radius * 2
+        break
+      case 'right':
+        ship.x = 0 + ship.radius * 2
+    }
+  }
+
+  const deltaParticles = {
+    colors: {
+      main: ['rgb(32, 159, 233)', 'rgb(149, 208, 247)'],
+      gases: ['#ededed', '#c4c4c4']
+    }
+  }
+
+  function engineParticles(ship) {
+
+    setTimeout(() => {
+      particles.forEach((particle, index) => {
+        if (particle.apha < 0) {
+          particles.splice(index, 1)
+        }
+        else {
+          particle.update()
+        }
+      })
+    }, 0)
+
+    if (ship.thrusting) {
+
+      const posX = (ship.x - ship.radius * 4 / 3 * Math.cos(ship.radian)) + Math.random()
+      const posY = (ship.y + ship.radius * 4 / 3 * Math.sin(ship.radian)) + Math.random()
+      const particleSize = Math.random() * (7 - (ship.thrust.x + ship.thrust.y) / 10)
+      const particleAlpha = 0.4 * (Math.random() + 0.5)
+
+      const direction = {
+        x: posX - (ship.x) + Math.random() * 2,
+        y: posY - (ship.y) + Math.random() * 2
+      }
+
+      for (let i = 0; i < 7; i++) {
+        particles.push(new engineParticle(
+          posX, posY, particleSize, deltaParticles.colors.main, direction,
+          particleAlpha
+        ))
+      }
+    }
+
+    if (ship.decrease) {
+
+      const posX = ship.x + ship.radius * 4 / 3 * Math.cos(ship.radian) * 1.2
+      const posY = ship.y - ship.radius * 4 / 3 * Math.sin(ship.radian) * 1.2
+      const particleSize = Math.random() * (3 - (ship.thrust.x + ship.thrust.y) / 10)
+      const particleAlpha = 0.9 * (Math.random() + 0.5)
+
+      const direction = {
+        x: posX - (ship.x + ship.thrust.x) + Math.random() * 2,
+        y: posY - (ship.y + ship.thrust.y) + Math.random() * 2
+      }
+
+      for (let i = 0; i < 5; i++) {
+
+        particles.push(new engineParticle(
+          posX, posY, particleSize, deltaParticles.colors.gases, direction, particleAlpha, 0.39
+        ))
+      }
+    }
+
+    if (ship.rotation != 0) {
+      const offset = ship.rotation > 0 ? -80 : 80
+      const posX = ship.x + 4 / 3 * (ship.radius * Math.cos(ship.radian + offset))
+      const posY = ship.y - 4 / 3 * (ship.radius * Math.sin(ship.radian + offset))
+      const particleSize = Math.random() * (3)
+      const particleAlpha = 0.9 * (Math.random() + 0.5)
+
+      const direction = {
+        x: posX - (ship.x + ship.thrust.x) - Math.random(),
+        y: posY - (ship.y + ship.thrust.y) - Math.random()
+      }
+
+      for (let i = 0; i < 5; i++) {
+
+        particles.push(new engineParticle(
+          posX, posY, particleSize, deltaParticles.colors.gases, direction, particleAlpha, 0.28
+        ))
+      }
+    }
   }
 
   return {
