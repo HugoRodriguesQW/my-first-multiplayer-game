@@ -51,16 +51,96 @@ export default function createGame(makeGravity, map, controller) {
       }
       this.move()
     }
+
+    manageGuns(action, gun) {
+      switch (action) {
+        case 'add':
+          this.guns.push(gun)
+          break
+        case 'remove':
+          this.guns.splice(gun, 1)
+      }
+    }
+  }
+
+  class bullet {
+    constructor(x, y, speed) {
+      this.x = x
+      this.y = y
+      this.velocity = {
+        x: speed.x,
+        y: speed.y
+      }
+    }
+
+    move() {
+      this.x += this.velocity.x / fps
+      this.y += this.velocity.y / fps
+    }
   }
 
   class gun {
-    constructor() {
+    constructor(rate, bulletSpeed) {
+      this.x = 0
+      this.y = 0
 
+      this.bulletSpeed = bulletSpeed || 1200 // Km/s
+
+      this.enableToShoot = true
+      this.rate = rate || 0.5 // Seconds
+
+      this.shoots = []
+    }
+    requestDestructBullets(id) {
+      for (const child in this.shoots) {
+        if (id === this.shoots[child].id) {
+          this.shoots.splice(child, 1)
+        }
+      }
     }
 
+    update(shoot) {
+      let time = 0
+      const up = setInterval(() => {
+        shoot.move()
+        time += 1 / fps
+        if (time >= 1) {
+          this.requestDestructBullets(shoot.id)
+          clearInterval(up)
+        }
+      }, 1000 / fps)
+    }
 
+    reload() {
+      let time = 0
+      const itval = setInterval(() => {
+        time += 1 / fps
+        if (time >= this.rate) {
+          clearInterval(itval)
+          this.enableToShoot = true
+        }
+      }, 1000 / fps)
+    }
+
+    fire(parent, ammunition) {
+
+      const bullet = new ammunition(
+        parent.x + 4 / 3 * (parent.radius * Math.cos(parent.radian)),
+        parent.y - 4 / 3 * (parent.radius * Math.sin(parent.radian)), {
+          x: parent.thrust.x + (Math.cos(parent.radian + parent.thrust.x / 100) * this.bulletSpeed),
+          y: parent.thrust.y - (Math.sin(parent.radian + parent.thrust.y / 100) * this.bulletSpeed)
+        }
+      )
+
+      const bulletId = this.shoots.length
+      bullet.id = `${bulletId} bullet`
+
+      this.shoots.push(bullet)
+      this.enableToShoot = false
+      this.update(this.shoots[bulletId])
+      this.reload()
+    }
   }
-
 
   class engineParticle {
     constructor(x, y, radius, colors, speed, alphaRate, friciton) {
@@ -83,14 +163,13 @@ export default function createGame(makeGravity, map, controller) {
     }
   }
 
-
-
-
-
   const playerShip = new ship({ x: 100, y: 100 },
     20, 90, 360, 2, 0.1)
 
-
+  playerShip.guns.push(
+    new gun(0.15)
+  )
+  
   const spaceShips = [playerShip]
   const particles = []
   const planets = map.planets
@@ -134,6 +213,7 @@ export default function createGame(makeGravity, map, controller) {
 
     // SHIPS UPDATE
     moveShip(playerShip)
+    GunsEngine(playerShip)
 
     // CHECK OBJECTS APPROACH
     map.planets.forEach((planet) => {
@@ -172,7 +252,15 @@ export default function createGame(makeGravity, map, controller) {
 
   setInterval(update, 1000 / fps)
 
-
+  function GunsEngine(ship) {
+    if (controller.shooting.is) {
+      for (const gun in ship.guns) {
+        if (ship.guns[gun].enableToShoot) {
+          ship.guns[gun].fire(ship, bullet)
+        }
+      }
+    }
+  }
 
   function moveShip(ship) {
     if (controller.increaseSpeed) {
