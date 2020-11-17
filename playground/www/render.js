@@ -311,10 +311,9 @@ export default function renderScreen(document, context, game, map, viewport) {
 
   function DrawShoots(shoot) {
     ctx.beginPath()
-    ctx.fillStyle = 'hsl(185 add *, 97%, 59%)'
+    ctx.fillStyle = 'white'
     ctx.arc(shoot.x, shoot.y, 2, 0, Math.PI * 2, false)
     ctx.fill()
-
   }
 
 

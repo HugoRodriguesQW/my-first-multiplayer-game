@@ -142,7 +142,6 @@ export default function createGame(makeGravity, map, controller) {
     }
   }
 
-
   class engineParticle {
     constructor(x, y, radius, colors, speed, alphaRate, friciton) {
       this.x = x
@@ -164,14 +163,13 @@ export default function createGame(makeGravity, map, controller) {
     }
   }
 
-
   const playerShip = new ship({ x: 100, y: 100 },
     20, 90, 360, 2, 0.1)
 
   playerShip.guns.push(
     new gun(0.15)
   )
-
+  
   const spaceShips = [playerShip]
   const particles = []
   const planets = map.planets
