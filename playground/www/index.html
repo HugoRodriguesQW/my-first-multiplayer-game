@@ -35,12 +35,19 @@
     area.height =  window.innerHeight
     const ctx = area.getContext('2d')
 
+    console.group('Timers')
+    console.time('Map Generation')
     const map = createMap()
     map.spawPlanets(10,900)
+    console.timeEnd('Map Generation')
 
     const controller = makeInputListener(document)
-    const game = createGame(makeGravity, map, controller)
 
+    console.time('Game Generation')
+    const game = createGame(makeGravity, map, controller)
+    console.timeEnd('Game Generation')
+
+    console.time('Render Generation')
     const render = renderScreen(document, ctx, game, map, {x: area.width, y: area.height})
     render.addUI([
     {id: 'velX', 	pos: 'top-left-1', style: {fillStyle: 'red',}},
@@ -50,6 +57,8 @@
     {id: 'posY', 	pos: 'bottom-center', style: {textAlign: 'center'}},
     {id: 'planetOrbiting', 	pos: 'top-center', val: 'planetOrbiting', style: {textAlign: 'center'}}
     ])
+    console.timeEnd('Render Generation')
+    console.groupEnd('Timers')
 
     function requestRender ()
     {

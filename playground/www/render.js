@@ -112,8 +112,6 @@ export default function renderScreen(document, context, game, map, viewport) {
     }
   }
 
-  console.log(Interface)
-
   function updateScreenPositions() {
     zeroScreenPosition.x = game.playerShip.x - viewport.x / 2
     zeroScreenPosition.y = game.playerShip.y - viewport.y / 2
