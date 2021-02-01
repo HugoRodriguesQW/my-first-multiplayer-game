@@ -19,7 +19,7 @@ Meu principal objetivo é aprender **node.js**,**socket.io** e me aprofundar mai
 
 ---
 
-### Para Iniciar
+### Para Iniciar ( Não está pronto ainda )
 
 - Primeiro digite **gitpod.io/#** antes da **url** do repositório.
 ```
