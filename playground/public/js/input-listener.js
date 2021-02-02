@@ -38,6 +38,10 @@ export default function createInput () {
             case 16: // Shift
                 controller.commands.heavyEngine = isKeyDown
                 break
+
+            case 192: // TEMP
+                console.clear()
+                break
             }
         }
     }
