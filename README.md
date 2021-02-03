@@ -1,13 +1,10 @@
-# Jogo Multiplayer
+# Jogo Espacial Multiplayer
 
 Meu primeiro jogo multiplayer para estudar **Node.js**, **Socket.io** e **Javascript**.
-
-
 <p align="center">
 <img align="left" src="https://nodejs.org/static/images/logos/nodejs-new-pantone-black.svg" width="100px" height="100px"/>
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/200px-Unofficial_JavaScript_logo_2.svg.png" height="100px"/>
 <img  align="right" src="https://upload.wikimedia.org/wikipedia/commons/9/96/Socket-io.svg" width="100px"/>
- 
 </p>
 
 ---
@@ -32,24 +29,20 @@ Meu principal objetivo é aprender **node.js**,**socket.io** e me aprofundar mai
 
 ### Utilidades
 
-Bugs: [my-first-multiplayer-game/issues/](https://github.com/HugoRodriguesQW/my-first-multiplayer-game/issues/)
+Bugs: [issues](https://github.com/HugoRodriguesQW/my-first-multiplayer-game/issues/)
 
-Gitpod: [gitpod.io/#](gitpod.io/#https://github.com/HugoRodriguesQW/my-first-multiplayer-game/)
+Gitpod: [gitpod.io](gitpod.io/#https://github.com/HugoRodriguesQW/my-first-multiplayer-game/)
+
+Youtube: [coding123](https://www.youtube.com/channel/UCqr7aW8KOD_hahUme4k_9Yw)
 
 ---
 
-### Updates do Projeto
+### YouTube : Codding123
 
-**!** O jogo ainda não existe. Começarei fazendo uma comunicação entre server e client em tempo real.
-Assim que conseguir isso criarei o jogo. Basta implementá-lo depois.
+<p align="center">
+<a href="https://youtu.be/JFSBRfM6yAU" target="_blank">
+<img src="http://i3.ytimg.com/vi/JFSBRfM6yAU/maxresdefault.jpg" width="70%"/>
+</a>
+</p>
 
-**! Interface Flexível: [YouTube](https://youtu.be/QinxgfMqpG0)**
-
-*! Asteroids (incompleto): [YouTube](https://youtu.be/kRI2PYlw68M)*
-
-*! Asteroids com updates (incompleto): [YouTube](https://youtu.be/56PjJ7q4DtA)*
-
-*! Comunicação entre *server* e *client* funcinando: [YouTube](https://youtu.be/V-CW__W4CeI)*
-
-**YouTube**: [HugoRodriguesQW](https://www.youtube.com/channel/UCqr7aW8KOD_hahUme4k_9Yw)
-
+<p align="center"><a href="https://youtu.be/JFSBRfM6yAU" target="_blank"> Abrir vídeo</a></p>
