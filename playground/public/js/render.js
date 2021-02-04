@@ -19,11 +19,53 @@ export default function makeRender(state, playerId)
             simple: './img/rocket.png'
         },
         effects: {
-            smoke: './img/smoke.png'
+            'smoke': './img/smoke.png',
+            'fire': './img/fire.png',
+            'white-fire': './img/white-fire.png'
         }
     }
 
-    function renderParticles (type)
+    const screen = {
+        addParticle (name, particle) {
+        if(this[name] === undefined) {
+            this[name] = {particle: {}}
+        }
+
+        const id = Math.random().toFixed(8)
+        Object.assign(particle, {lifetime: 1})
+        this[name].particle[id] = particle
+
+        },
+
+        updateParticles (id) {
+        if(this[id]){
+        const emmiter = this[id].particle
+        for(const p in emmiter) {
+            const {x,y,w,h,src, rate} = emmiter[p]
+
+            ctx.save()
+            ctx.globalAlpha = emmiter[p].lifetime
+            ctx.drawImage(resources.effects[src], x - (w/2), y - (h/2), w, h)
+            ctx.globalAlpha = 1
+            ctx.restore()
+
+            emmiter[p].lifetime -= rate + (Math.random()/10)
+            const sizeRate = Math.random() < .5? 0.1 : -0.1
+            emmiter[p].w += sizeRate
+            emmiter[p].h += sizeRate
+            emmiter[p].x += emmiter[p].speed.x
+            emmiter[p].y += emmiter[p].speed.y
+
+            if(emmiter[p].lifetime < 0) {
+                delete emmiter[p]
+            }
+        }
+        }
+        }
+    }
+
+
+    function renderParticles (type, id)
     {
         ctx.beginPath ()
 
@@ -34,45 +76,88 @@ export default function makeRender(state, playerId)
 
         const particleTypes = { // (O,O)  = center
             thrusting() {
-                ctx.fillStyle = 'red'
-                ctx.arc(ref.x + 5.25 , ref.y + 59.25, 1, 0, 2 * Math.PI)
-                ctx.arc(-ref.x - 5.25 , ref.y + 59.25, 1, 0, 2 * Math.PI)
-                ctx.fill()
+                screen.addParticle(id, {
+                    x: ref.x + 5.25, y: ref.y + 59.55,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.01, speed: {x:0, y: 1} })
+
+                screen.addParticle(id, {
+                    x: -ref.x - 5.25, y: ref.y + 59.55,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.01, speed: {x:0, y: 1} })
             },
+
             decreasing() {
-                ctx.fillStyle = 'red'
-                ctx.arc(ref.x + 6, ref.y + 8.5, 1, 0, 2 * Math.PI)
-                ctx.arc( -ref.x - 6 , ref.y + 8.5, 1, 0, 2 * Math.PI)
-                ctx.fill()
+                screen.addParticle(id, {
+                    x: ref.x + 6, y: ref.y + 9,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.01, speed: {x:0, y: -1} })
+
+                screen.addParticle(id, {
+                    x: -ref.x - 6 , y: ref.y + 9,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.01, speed: {x:0, y: -1} })
+
             },
+
             rotateRight() {
-                ctx.fillStyle = 'red'
-                ctx.arc(ref.x, ref.y + 20, 1, 0, 2 * Math.PI)
-                ctx.arc( -ref.x, -ref.y - 20, 1, 0, 2 * Math.PI)
-                ctx.fill()
+                screen.addParticle(id, {
+                    x: ref.x, y: ref.y + 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:-1, y: 0} })
+
+                screen.addParticle(id, {
+                    x: -ref.x, y: -ref.y - 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:1, y: 0} })
+
             },
+
             rotateLeft() {
-                ctx.fillStyle = 'red'
-                ctx.arc(-ref.x, ref.y + 20, 1, 0, 2 * Math.PI)
-                ctx.arc( ref.x, -ref.y - 20, 1, 0, 2 * Math.PI)
-                ctx.fill()
+                screen.addParticle(id, {
+                    x: -ref.x, y: ref.y + 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:1, y: 0} })
+
+                screen.addParticle(id, {
+                    x: ref.x, y: -ref.y - 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:-1, y: 0} })
+            },
+
+            moveRight() {
+                screen.addParticle(id, {
+                    x: ref.x, y: ref.y + 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.07, speed: {x:-1, y: 0} })
+                screen.addParticle(id, {
+                    x: ref.x, y: -ref.y - 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.07, speed: {x:-1, y: 0} })
             },
             moveLeft() {
-                ctx.fillStyle = 'red'
-                ctx.arc(-ref.x, ref.y + 20, 1, 0, 2 * Math.PI)
-                ctx.arc( -ref.x, -ref.y - 20, 1, 0, 2 * Math.PI)
-                ctx.fill()
+                screen.addParticle(id, {
+                    x: -ref.x, y: ref.y + 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:1, y: 0} })
+                    screen.addParticle(id, {
+                    x: -ref.x, y: -ref.y - 20,
+                    w: 4 + Math.random()*1.5 , h: 4 + Math.random()*1.5,
+                    src: 'smoke', rate: 0.1, speed: {x:1, y: 0} })
+
             },
-            moveRight() {
-                ctx.fillStyle = 'red'
-                ctx.arc(ref.x, ref.y + 20, 1, 0, 2 * Math.PI)
-                ctx.arc( ref.x, -ref.y - 20, 1, 0, 2 * Math.PI)
-                ctx.fill()
-            },
+
             heavyEngine() {
-                ctx.fillStyle = 'red'
-                ctx.arc(0, -ref.y + 5, 5, 0, 2 * Math.PI)
-                ctx.fill()
+                 screen.addParticle(id, {
+                    x: 0, y: -ref.y + 2,
+                    w: 12 + Math.random()*1.5 , h: 12 + Math.random()*1.5,
+                    src: 'fire', rate: 0.0001, speed: {x:0, y: 1}
+                   })
+                    screen.addParticle(id, {
+                    x: 0, y: -ref.y + 2,
+                    w: 12 + Math.random()*1.5 , h: 12 + Math.random()*1.5,
+                    src: 'white-fire', rate: 0.01, speed: {x:0, y: 1}
+                    })
             }
         }
 
@@ -94,20 +179,19 @@ export default function makeRender(state, playerId)
             )
 
             ctx.rotate(players[p].rot*Math.PI/180)
+
+            screen.updateParticles(p)
+
+
             ctx.drawImage(resources.rockets.simple,
             -width/2, -height/2,
             width, height
             )
 
-            Object.keys(players[p].particleEmitters).map( (type, ind) => {
-                renderParticles(type)
-
-                //TODO: Remove later (console)
-                ctx.beginPath()
-                ctx.fillStyle= 'white'
-                ctx.fillText(type, 30, 35.7 + (10*ind))
-                ctx.closePath()
+            Object.keys(players[p].particleEmitters).map( (type) => {
+                renderParticles(type, p)
             })
+
             ctx.restore ()
 
         }
@@ -116,7 +200,7 @@ export default function makeRender(state, playerId)
     function update() {
 
         if(state.players[playerId]) {
-        ctx.clearRect(camera.x, camera.y, camera.x + canvas.width + 100, camera.y + canvas.height + 100)
+        ctx.clearRect(camera.x, camera.y, camera.x + canvas.width *2 , camera.y + canvas.height *2)
         camera.follow(state.players[playerId])
         ctx.setTransform(1, 0, 0, 1, -camera.x, -camera.y)
 
