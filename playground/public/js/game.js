@@ -1,7 +1,5 @@
 export default function createGame (gameSpeed) {
 
-    console.log( '%c\uD83D\uDE80 Space Game Console \uD83D\uDE80', 'background-color: #03fc7f; margin: 0; padding: 0; font-size: 13px')
-
     const state = {
         players: {}
     }
@@ -9,9 +7,9 @@ export default function createGame (gameSpeed) {
 
     class rocket {
         constructor (setting) {
-        this.x = setting.x || 0
-        this.y = setting.y || 0
-        this.rot = setting.rotation || 0
+        this.x = setting.x === undefined? Math.random() * 700 : setting.x
+        this.y = setting.y === undefined? Math.random() * 700 : setting.y
+        this.rot = setting.rotation === undefined? Math.random() * 360 : setting.rotation
 
         this.particleEmitters = {}
         }
@@ -19,23 +17,22 @@ export default function createGame (gameSpeed) {
 
 
     function addNewPlayer({id, x, y, rotation}) {
-        console.info('%c GAME:', 'color: #03fc7f', `${id} connected.\n`, `x: ${x} \n`, `y: ${y} \n`, `rotation: ${rotation} \n`)
         const newplayer = new rocket({x, y, rotation})
         state.players[id] = newplayer
         return newplayer
     }
 
     function deletePlayer (id) {
-        console.info('%c GAME:', 'color: #03fc7f', `${id} disconnected.\n`)
         delete state.players[id]
+        return ': )'
     }
 
-    function addPlayerFunctions (playerId, {thrustSpeed, boosterSpeed}) {
+    function addPlayerFunctions (playerId, {st, sb}) {
 
             const player = state.players[playerId]
 
-            player.thrustSpeed = thrustSpeed || 0.7
-            player.boosterSpeed = boosterSpeed || 1.9
+            player.thrustSpeed = st || 0.5
+            player.boosterSpeed = sb || 1.5
             player.thrust  = { x: 0, y: 0 }
             player.turn = 0
 
@@ -120,6 +117,9 @@ export default function createGame (gameSpeed) {
             player.deleteEmitter = function (type) {
                 delete player.particleEmitters[type]
             }
+
+
+            return ': )'
 
 
     }
