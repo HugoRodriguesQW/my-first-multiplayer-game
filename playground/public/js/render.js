@@ -18,8 +18,9 @@ export default function makeRender(state, playerId)
         rockets: {
             simple: './img/rocket.png'
         },
-
-        loaded: 1
+        effects: {
+            smoke: './img/smoke.png'
+        }
     }
 
     function renderParticles (type)
@@ -93,7 +94,6 @@ export default function makeRender(state, playerId)
             )
 
             ctx.rotate(players[p].rot*Math.PI/180)
-
             ctx.drawImage(resources.rockets.simple,
             -width/2, -height/2,
             width, height
@@ -116,7 +116,7 @@ export default function makeRender(state, playerId)
     function update() {
 
         if(state.players[playerId]) {
-        ctx.clearRect(camera.x, camera.y, camera.x + canvas.width, camera.y + canvas.height)
+        ctx.clearRect(camera.x, camera.y, camera.x + canvas.width + 100, camera.y + canvas.height + 100)
         camera.follow(state.players[playerId])
         ctx.setTransform(1, 0, 0, 1, -camera.x, -camera.y)
 
@@ -130,33 +130,32 @@ export default function makeRender(state, playerId)
 
 
     async function start () {
-        const rockets = resources.rockets
-        for (const r in rockets) {
-            const local = rockets[r]
-            const rocket = new Image()
-            rocket.src = local
-            resources.rockets[r] = rocket
-            rocket.onload = function () {
-                resources.loaded++
-            }
-        }
 
-        function checkLoadedResources () {
-            return new Promise ( (accept) => {
-                const checker = setInterval ( ()=> {
-                if( resources.loaded === Object.keys(resources).length) {
-                    accept()
-                    clearInterval(checker)
+        for(const type in resources) {
+            await new Promise ( (accept) => {
+
+                for (const res in resources[type]){
+
+                    const resource = resources[type]
+                    const image = new Image()
+                    image.src = resource[res]
+                    resource[res] = image
+
+                    image.onload = function () {
+                        const keys = Object.keys(resource)
+
+                        if(keys.indexOf(res) === keys.length -1 ) {
+                            console.groupEnd()
+                            accept()
+                        }
+                    }
                 }
-                }, 100)
             })
         }
 
-        await checkLoadedResources ()
         update()
     }
 
 
     start()
-    window.requestAnimationFrame(update)
 }
