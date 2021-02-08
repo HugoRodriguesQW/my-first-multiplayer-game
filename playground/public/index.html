@@ -13,6 +13,12 @@
 
     <!-- LINK  / Fonts / Css --->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet" />
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    </style>
 
     <!-- SCRIPT / External -->
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -26,25 +32,30 @@
 
     <script type="module">
         const playerId = 'ID-PLAYER'
+
         import createInput from './js/input-listener.js'
         import createGame from './js/game.js'
         import createRender from './js/render.js'
 
-        const game = createGame(60)
-        const render = createRender(game.state, playerId)
+        const game = createGame(60) // Game Speed (p/s)
+        const render = createRender(game.state, playerId) // Render game.state and MY player
 
-        const myRocket = game.addNewPlayer({id: playerId, x: 300, y: 300, rotation: 0 })
+        const myRocket = game.addNewPlayer({id: playerId, x: 300, y: 300, rotation: 0.0 })
         game.addPlayerFunctions(playerId, {thrustSpeed : 0.5, boosterSpeed: 1.5})
 
         const inputListener = createInput()
         setInterval( () => {
 
-        Object.assign(myRocket.controller, inputListener)
+        if (game.state.players[playerId]) {
+        Object.assign(game.state.players[playerId].controller, inputListener)
         myRocket.move()
-
+        }
         }, 1000/ 60 )
 
-        game.addNewPlayer({id: 'ID-123', x: 400, y: 300, rotation: 90 })
+        game.addNewPlayer({id: 'ID-123'})
+
+        document.addPlayer = game.addNewPlayer
+        document.delete = game.deletePlayer
 
     </script>
 </body>

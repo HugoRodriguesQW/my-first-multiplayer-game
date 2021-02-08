@@ -46,8 +46,9 @@ export default function createInput () {
         }
     }
 
-    addEventListener('keydown', controller.listen)
-    addEventListener('keyup', controller.listen)
+    
+    window.addEventListener('keydown', controller.listen)
+    window.addEventListener('keyup', controller.listen)
 
     return controller.commands
 }
