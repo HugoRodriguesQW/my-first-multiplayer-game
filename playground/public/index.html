@@ -21,6 +21,7 @@
     </style>
 
     <!-- SCRIPT / External -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script> (Effects) -->
 
@@ -31,31 +32,74 @@
     <canvas id="game-area" style="background-color: #000;"></canvas>
 
     <script type="module">
-        const playerId = 'ID-PLAYER'
-
         import createInput from './js/input-listener.js'
         import createGame from './js/game.js'
         import createRender from './js/render.js'
 
-        const game = createGame(60) // Game Speed (p/s)
-        const render = createRender(game.state, playerId) // Render game.state and MY player
-
-        const myRocket = game.addNewPlayer({id: playerId, x: 300, y: 300, rotation: 0.0 })
-        game.addPlayerFunctions(playerId, {thrustSpeed : 0.5, boosterSpeed: 1.5})
-
+        const game = createGame(60)
         const inputListener = createInput()
-        setInterval( () => {
+        const staticListener = Object.assign({}, inputListener)
 
-        if (game.state.players[playerId]) {
-        Object.assign(game.state.players[playerId].controller, inputListener)
-        myRocket.move()
-        }
-        }, 1000/ 60 )
+        const socket = io()
 
-        game.addNewPlayer({id: 'ID-123'})
+        socket.on('connect', () => {
+          const render = createRender(game.state, socket.id)
+        })
 
-        document.addPlayer = game.addNewPlayer
-        document.delete = game.deletePlayer
+        socket.on('boot', (state)=> {
+
+          Object.assign(game.state, state)
+          const myRocket = game.state.players[socket.id]
+
+          for(const id in game.state.players) {
+            game.addPlayerFunctions(id)
+          }
+        
+          setInterval( ()=> {
+            Object.assign(myRocket.controller, inputListener)
+            for(const r in game.state.players){
+             game.state.players[r].move()
+            }
+
+            const InputChanges = Object.keys(inputListener).filter(key => {
+              return inputListener[key] !== staticListener[key]
+            })
+
+            if(InputChanges.length != 0){
+              socket.emit('change', (
+                {
+                  id: socket.id, 
+                  key: 'controller', 
+                  values: inputListener
+                }
+              ))
+            }
+
+            Object.assign(staticListener, inputListener)
+          }, 1000/30)
+        })
+          
+        socket.on('move-player', ({id, key, values})=> {
+          game.state.players[id][key] = values
+        })
+
+        socket.on('update-player', ({id, values})=> {
+          Object.assign(game.state.players[id], values)
+        })
+
+        socket.on('add-player', ({id, state})=> {
+          if(id != socket.id){
+            state.id = id
+            game.addNewPlayer(state)
+            game.addPlayerFunctions(id)
+          } 
+        })
+
+        socket.on('delete-player', (playerId)=> {
+          if(playerId != socket.id){
+            game.deletePlayer(playerId) 
+          } 
+        })
 
     </script>
 </body>

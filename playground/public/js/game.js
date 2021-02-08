@@ -9,17 +9,17 @@ export default function createGame (gameSpeed) {
         constructor (setting) {
         this.x = setting.x === undefined? Math.random() * 700 : setting.x
         this.y = setting.y === undefined? Math.random() * 700 : setting.y
-        this.rot = setting.rotation === undefined? Math.random() * 360 : setting.rotation
+        this.rot = setting.rot === undefined? Math.random() * 360 : setting.rot
 
         this.particleEmitters = {}
         }
     }
 
 
-    function addNewPlayer({id, x, y, rotation}) {
-        const newplayer = new rocket({x, y, rotation})
+    function addNewPlayer({id, x, y, rot}) {
+        const newplayer = new rocket({x, y, rot})
         state.players[id] = newplayer
-        return newplayer
+        return state.players[id]
     }
 
     function deletePlayer (id) {
@@ -27,12 +27,11 @@ export default function createGame (gameSpeed) {
         return ': )'
     }
 
-    function addPlayerFunctions (playerId, {st, sb}) {
-
-            const player = state.players[playerId]
-
-            player.thrustSpeed = st || 0.5
-            player.boosterSpeed = sb || 1.5
+    function addPlayerFunctions (id) {
+            console.log('add functions ' + id)
+            const player = state.players[id]
+            player.thrustSpeed = 0.5
+            player.boosterSpeed = 1.5
             player.thrust  = { x: 0, y: 0 }
             player.turn = 0
 

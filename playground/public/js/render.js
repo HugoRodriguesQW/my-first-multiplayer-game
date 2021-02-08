@@ -199,7 +199,7 @@ export default function makeRender(state, playerId)
         const render = {
             text({value, style, pos}){
                 for(const prop in style){
-                    ctx[prop] = style[propcd]
+                    ctx[prop] = style[prop]
                 }
                 ctx.fillText(value, camera.x + pos[0], camera.y + pos[1])
             },
