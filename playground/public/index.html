@@ -13,6 +13,12 @@
 
     <!-- LINK  / Fonts / Css --->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet" />
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    </style>
 
     <!-- SCRIPT / External -->
     <script src="//code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -39,7 +45,7 @@
 
         const inputListener = createInput()
         setInterval( () => {
-            
+
         if (game.state.players[playerId]) {
         Object.assign(game.state.players[playerId].controller, inputListener)
         myRocket.move()
