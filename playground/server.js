@@ -6,36 +6,43 @@ import createGame from './public/js/game.js'
 const app = express()
 const server = http.createServer(app)
 const sockets = socketio(server)
-
 app.use(express.static('public'))
-
-console.log('starting server')
 
 const game = createGame(60)
 
 sockets.on('connection', (socket)=> {
-  console.log('player connected: ' + socket.id)
-  
-  const player = game.addNewPlayer({id:socket.id})
-  socket.emit('boot', game.state)
-  sockets.emit('add-player', ({id: socket.id, state: player}))
+  const socketId = socket.id
+  console.info('> Connected:', socketId)
+
+  game.addNewPlayer(socketId, {})
+  notifyAll ('add-player', {
+    id:socketId, values: game.state.players[socketId]
+  })
+  socket.emit('bootstrap', game.state)
   
   socket.on('disconnect', () => {
-    game.deletePlayer(socket.id)
-    console.log('player disconnected: ' + socket.id)
-
-    sockets.emit('delete-player', (socket.id))
+    console.info('> Disconnected:', socketId)
+    game.deletePlayer(socketId)
+    notifyAll ('delete-player', {
+    id: socketId})
   })
 
-  socket.on('change', ({id, key, values})=> {
-    const tar = {}
-    tar.id = id
-    tar.key = key
-    tar.values = values
-    game.state.players[id][key] = values
-    sockets.emit('move-player', (tar))
+  socket.on('apply-changes', ({key, values, command}) => {
+    console.info('> changing', key, 'of', socketId)
+    Object.assign(game.state.players[socketId][key], values)
+    notifyAll(command, {id: socketId, key, values})
+  })
+
+  socket.on('scheduled-updates', ({values, command})=> {
+    console.info('> scheduled',socketId, 'updates.')
+    Object.assign(game.state.players[socketId], values)
+    notifyAll(command, {id: socketId, values})
   })
 })
+
+function notifyAll (command, {id, key, values}) {
+  sockets.emit(command, ({id, key, values}))
+}
 
 server.listen(3000, () => {
     console.log(`> Server listening on port: 3000`)

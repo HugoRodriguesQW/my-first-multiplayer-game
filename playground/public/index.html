@@ -46,7 +46,7 @@
           const render = createRender(game.state, socket.id)
         })
 
-        socket.on('boot', (state)=> {
+        socket.on('bootstrap', (state)=> {
 
           Object.assign(game.state, state)
           const myRocket = game.state.players[socket.id]
@@ -55,10 +55,10 @@
             game.addPlayerFunctions(id)
           }
         
-          setInterval( ()=> {
+          const updater = setInterval( ()=> {
             Object.assign(myRocket.controller, inputListener)
-            for(const r in game.state.players){
-             game.state.players[r].move()
+            for(const playerId in game.state.players){
+             game.movePlayer(playerId)
             }
 
             const InputChanges = Object.keys(inputListener).filter(key => {
@@ -66,11 +66,11 @@
             })
 
             if(InputChanges.length != 0){
-              socket.emit('change', (
+              socket.emit('apply-changes', (
                 {
-                  id: socket.id, 
                   key: 'controller', 
-                  values: inputListener
+                  values: inputListener,
+                  command: 'update-player-key'
                 }
               ))
             }
@@ -78,26 +78,41 @@
             Object.assign(staticListener, inputListener)
           }, 1000/30)
         })
-          
-        socket.on('move-player', ({id, key, values})=> {
-          game.state.players[id][key] = values
-        })
 
-        socket.on('update-player', ({id, values})=> {
-          Object.assign(game.state.players[id], values)
-        })
+        const positionSender = setInterval (()=> {
+          const {x, y, rot, thrust, turn} = game.state.players[socket.id]
+          socket.emit('scheduled-updates', ({
+            values: {x, y, rot, thrust, turn},
+            command: 'update-player-pos'
+          }))
+        }, 5000)
 
-        socket.on('add-player', ({id, state})=> {
+        socket.on ('update-player-key', ({id, key, values})=> {
           if(id != socket.id){
-            state.id = id
-            game.addNewPlayer(state)
+            Object.assign(game.state.players[id][key],values)
+          }
+        })
+
+        socket.on ('update-player-pos', ({id, values})=> {
+          if(id != socket.id){
+            console.info('GAME:', 'id', id, 'pos up!')
+            Object.assign(game.state.players[id],values)
+          }
+        })
+        
+        socket.on('add-player', ({id, values})=> {
+          if(id != socket.id){
+            console.info('GAME:', 'player', id, 'added.')
+            values.id = id
+            game.addNewPlayer(id, values)
             game.addPlayerFunctions(id)
           } 
         })
 
-        socket.on('delete-player', (playerId)=> {
-          if(playerId != socket.id){
-            game.deletePlayer(playerId) 
+        socket.on('delete-player', ({id})=> {
+          if(id != socket.id){
+            console.info('GAME:', 'player', id, 'removed.')
+            game.deletePlayer(id) 
           } 
         })
 
