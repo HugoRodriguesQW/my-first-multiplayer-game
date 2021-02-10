@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Meu primeiro jogo multiplayer para estudar Node.js, Socket.io e Javascript.",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
