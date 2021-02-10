@@ -18,7 +18,7 @@ Meu principal objetivo é aprender **node.js**,**socket.io** e me aprofundar mai
 
 ---
 
-### Para Iniciar ( Não está pronto ainda )
+### Para Iniciar ( Em andamento )
 
 - Primeiro digite **gitpod.io/#** antes da **url** do repositório.
 ```
@@ -43,8 +43,8 @@ Youtube: [coding123](https://www.youtube.com/channel/UCqr7aW8KOD_hahUme4k_9Yw)
 
 <p align="center">
 <a href="https://youtu.be/JFSBRfM6yAU" target="_blank">
-<img src="http://i3.ytimg.com/vi/JFSBRfM6yAU/maxresdefault.jpg" width="70%"/>
+<img src="http://i3.ytimg.com/vi/MHNziKdW-AE/maxresdefault.jpg" width="70%"/>
 </a>
 </p>
 
-<p align="center"><a href="https://youtu.be/JFSBRfM6yAU" target="_blank"> Abrir vídeo</a></p>
+<p align="center"><a href="https://youtu.be/MHNziKdW-AE" target="_blank"> Abrir vídeo</a></p>
